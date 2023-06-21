@@ -14,6 +14,12 @@ library(Taxonstand)
 source("scripts/EX1_ggplot_themes.R")
 
 
+# ADD DIRECTORY: FIGURES ----
+
+# Add directory for all figures
+dir.create("outputs/figures")
+
+
 # **[CHANGE]** - DECIDE WHETHER TO USE ALL HITS OR TOP HITS ONLY ----
 
 # Decision

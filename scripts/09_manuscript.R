@@ -17,6 +17,12 @@ source("scripts/EX1_ggplot_themes.R")
 source("scripts/09_manuscript_FUNCTION.R")
 
 
+# ADD DIRECTORY: MANUSCRIPT FIGURES ----
+
+# Add directory for all manuscript figures
+dir.create("outputs/figures/manuscript")
+
+
 # **[CHANGE]** - DECIDE WHETHER TO RETAIN PLOT 37 OR NOT ----
 
 # Decision

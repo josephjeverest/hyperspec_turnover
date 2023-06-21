@@ -11,6 +11,12 @@ library(Taxonstand)
 library(sp)
 
 
+# ADD DIRECTORY: OUTPUTS ----
+
+# Add directory for all outputs
+dir.create("outputs")
+
+
 # **[CHANGE]** - DECIDE WHETHER TO USE ALL HITS OR TOP HITS ONLY ----
 
 # Decision
