@@ -1,0 +1,205 @@
+,FID,LOC_ID,SITECODE,UTM_E,UTM_N,LATITUDE,LONGITUDE,ALT_SITECODE,PI,LOC_TYPE,GPS_ELEV,DATE_COLLECTED,PROJECT_DESCRIPTION
+1,23,24,PTQUAD10A,449865.043,4433960.44,40.0543985,-105.5878025,Saddle Pt Quad 10A,Marilyn Walker,observational plot,3539.433,,Point quadrat measurements at the saddle are made yearly
+1,141,142,PTQUAD20A,449876.403,4434002.945,40.0547821,-105.5876726,Saddle Pt Quad 20A,Marilyn Walker,observational plot,3544.369,,Point quadrat measurements at the saddle are made yearly
+1,142,143,PTQUAD30A,449883.868,4434062.163,40.055316,-105.5875896,Saddle Pt Quad 30A,Marilyn Walker,observational plot,3543.099,,Point quadrat measurements at the saddle are made yearly
+1,143,144,PTQUAD40A,449903.4,4434101.735,40.0556737,-105.5873637,Saddle Pt Quad 40A,Marilyn Walker,observational plot,3540.388,,Point quadrat measurements at the saddle are made yearly
+1,144,145,PTQUAD50A,449909.654,4434149.074,40.0561006,-105.587294,Saddle Pt Quad 50A,Marilyn Walker,observational plot,3536.414,,Point quadrat measurements at the saddle are made yearly
+1,145,146,PTQUAD60A,449928.136,4434202.162,40.0565799,-105.5870815,Saddle Pt Quad 60A,Marilyn Walker,observational plot,3534.113,,Point quadrat measurements at the saddle are made yearly
+1,146,147,PTQUAD70A,449940.826,4434250.699,40.057018,-105.5869364,Saddle Pt Quad 70A,Marilyn Walker,observational plot,3529.63,,Point quadrat measurements at the saddle are made yearly
+1,147,148,PTQUAD80A,449953.772,4434293.177,40.0574014,-105.5867879,Saddle Pt Quad 80A,Marilyn Walker,observational plot,3522.352,,Point quadrat measurements at the saddle are made yearly
+1,148,149,PTQUAD80,449906.812,4434309.889,40.0575492,-105.5873398,Saddle Pt Quad 80,Marilyn Walker,observational plot,3514.446,,Point quadrat measurements at the saddle are made yearly
+1,149,150,PTQUAD70,449892.607,4434262.513,40.0571216,-105.5875027,Saddle Pt Quad 70,Marilyn Walker,observational plot,3521.854,,Point quadrat measurements at the saddle are made yearly
+1,150,151,PTQUAD60,449879.471,4434213.842,40.0566823,-105.5876529,Saddle Pt Quad 60,Marilyn Walker,observational plot,3526.597,,Point quadrat measurements at the saddle are made yearly
+1,151,152,PTQUAD50,449867.475,4434162.509,40.0562191,-105.5877896,Saddle Pt Quad 50,Marilyn Walker,observational plot,3530.685,,Point quadrat measurements at the saddle are made yearly
+1,152,153,PTQUAD40,449854.851,4434118.666,40.0558234,-105.5879342,Saddle Pt Quad 40,Marilyn Walker,observational plot,3533.429,,Point quadrat measurements at the saddle are made yearly
+1,153,154,PTQUAD30,449841.431,4434070.974,40.0553929,-105.5880878,Saddle Pt Quad 30,Marilyn Walker,observational plot,3536.463,,Point quadrat measurements at the saddle are made yearly
+1,154,155,PTQUAD20,449829.06,4434022.378,40.0549543,-105.5882291,Saddle Pt Quad 20,Marilyn Walker,observational plot,3538.602,,Point quadrat measurements at the saddle are made yearly
+1,155,156,PTQUAD10,449816.502,4433973.837,40.0545163,-105.5883726,Saddle Pt Quad 10,Marilyn Walker,observational plot,3533.715,,Point quadrat measurements at the saddle are made yearly
+1,156,157,EP10-1E,449725.341,4434086.781,40.0555284,-105.5894501,EP10-1E,Marilyn Walker,manipulative plot,3530.299,,ITEX exp
+1,157,158,EP10-1C,449725.633,4434089.002,40.0555484,-105.5894469,EP10-1C,Marilyn Walker,manipulative plot,3529.483,,ITEX exp
+1,158,159,10-1E,449730.737,4434110.968,40.0557466,-105.5893887,10-1E,Marilyn Walker,manipulative plot,3528.918,,ITEX exp
+1,159,160,10-1C,449729.405,4434109.565,40.0557339,-105.5894042,10-1C,Marilyn Walker,manipulative plot,3529.491,,ITEX exp
+1,160,161,10-2C,449731.761,4434118.882,40.055818,-105.5893773,10-2C,Marilyn Walker,manipulative plot,3529.808,,ITEX exp
+1,161,162,10-2E,449733.447,4434120.103,40.0558291,-105.5893577,10-2E,Marilyn Walker,manipulative plot,3529.619,,ITEX exp
+1,162,163,10-3E,449734.666,4434126.083,40.055883,-105.5893438,10-3E,Marilyn Walker,manipulative plot,3528.923,,ITEX exp
+1,163,164,10-3C,449735.234,4434128.052,40.0559008,-105.5893373,10-3C,Marilyn Walker,manipulative plot,3528.854,,ITEX exp
+1,164,165,10-4C,449735.919,4434134.707,40.0559608,-105.5893298,10-4C,Marilyn Walker,manipulative plot,3528.297,,ITEX exp
+1,165,166,10-4E,449737.648,4434136.038,40.0559729,-105.5893096,10-4E,Marilyn Walker,manipulative plot,3528.281,,ITEX exp
+1,166,167,10-5E,449738.031,4434138.137,40.0559918,-105.5893053,10-5E,Marilyn Walker,manipulative plot,3528.126,,ITEX exp
+1,167,168,10-5C,449737.218,4434139.853,40.0560072,-105.589315,10-5C,Marilyn Walker,manipulative plot,3528.071,,ITEX exp
+1,168,169,EP10-2E,449748.661,4434183.332,40.0563996,-105.5891842,EP10-2E,Marilyn Walker,manipulative plot,3526.534,,ITEX exp
+1,169,170,EP10-2C,449748.546,4434185.234,40.0564167,-105.5891857,EP10-2C,Marilyn Walker,manipulative plot,3526.527,,ITEX exp
+1,170,171,EP10-3E,449750.723,4434187.871,40.0564406,-105.5891604,EP10-3E,Marilyn Walker,manipulative plot,3525.998,,ITEX exp
+1,171,172,EP10-3C,449751.741,4434189.055,40.0564514,-105.5891485,EP10-3C,Marilyn Walker,manipulative plot,3525.71,,ITEX exp
+1,172,173,EP25-3E,449761.885,4434165.754,40.056242,-105.5890278,EP25-3E,Marilyn Walker,manipulative plot,3527.402,,ITEX exp
+1,173,174,EP25-3C,449761.463,4434164.205,40.0562281,-105.5890326,EP25-3C,Marilyn Walker,manipulative plot,3527.524,,ITEX exp
+1,174,175,25-5E,449751.916,4434131.63,40.055934,-105.589142,25-5E,Marilyn Walker,manipulative plot,3529.014,,ITEX exp
+1,175,176,25-5C,449750.972,4434129.923,40.0559186,-105.589153,25-5C,Marilyn Walker,manipulative plot,3529.003,,ITEX exp
+1,176,177,25-4E,449750.64,4434125.094,40.0558751,-105.5891565,25-4E,Marilyn Walker,manipulative plot,3528.356,,ITEX exp
+1,177,178,25-4C,449748.81,4434124.534,40.0558699,-105.5891779,25-4C,Marilyn Walker,manipulative plot,3528.145,,ITEX exp
+1,178,179,25-3E,449749.899,4434123.061,40.0558567,-105.589165,25-3E,Marilyn Walker,manipulative plot,3528.673,,ITEX exp
+1,179,180,25-3C,449748.091,4434121.367,40.0558413,-105.5891861,25-3C,Marilyn Walker,manipulative plot,3529.502,,ITEX exp
+1,180,181,25-2E,449748.336,4434118.92,40.0558193,-105.589183,25-2E,Marilyn Walker,manipulative plot,3529.735,,ITEX exp
+1,181,182,25-2C,449747.257,4434117.303,40.0558047,-105.5891955,25-2C,Marilyn Walker,manipulative plot,3529.796,,ITEX exp
+1,182,183,25-1E,449747.743,4434115.804,40.0557912,-105.5891897,25-1E,Marilyn Walker,manipulative plot,3530.111,,ITEX exp
+1,183,184,25-1C,449746.408,4434114.181,40.0557765,-105.5892052,25-1C,Marilyn Walker,manipulative plot,3529.965,,ITEX exp
+1,184,185,EP25-2C,449741.576,4434084.902,40.0555124,-105.5892596,EP25-2C,Marilyn Walker,manipulative plot,3530.521,,ITEX exp
+1,185,186,EP25-2E,449740.086,4434083.754,40.055502,-105.589277,EP25-2E,Marilyn Walker,manipulative plot,3530.606,,ITEX exp
+1,186,187,EP25-1C,449740.212,4434081.907,40.0554854,-105.5892754,EP25-1C,Marilyn Walker,manipulative plot,3530.628,,ITEX exp
+1,187,188,EP45-1E,449759.577,4434080.604,40.0554748,-105.5890483,EP45-1E,Marilyn Walker,manipulative plot,3531.137,,ITEX exp
+1,188,189,EP45-1C,449758.651,4434082.099,40.0554882,-105.5890592,EP45-1C,Marilyn Walker,manipulative plot,3531.132,,ITEX exp
+1,189,190,EP45-2E,449760.293,4434082.802,40.0554946,-105.58904,EP45-2E,Marilyn Walker,manipulative plot,3531.45,,ITEX exp
+1,190,191,EP45-2C,449760.861,4434084.458,40.0555096,-105.5890335,EP45-2C,Marilyn Walker,manipulative plot,3531.696,,ITEX exp
+1,191,192,45-1E,449762.063,4434091.324,40.0555715,-105.5890199,45-1E,Marilyn Walker,manipulative plot,3531.62,,ITEX exp
+1,192,193,45-1C,449761.175,4434092.959,40.0555862,-105.5890305,45-1C,Marilyn Walker,manipulative plot,3531.472,,ITEX exp
+1,193,194,45-2E,449762.704,4434094.2,40.0555974,-105.5890126,45-2E,Marilyn Walker,manipulative plot,3531.609,,ITEX exp
+1,194,195,45-2C,449761.883,4434096.04,40.055614,-105.5890224,45-2C,Marilyn Walker,manipulative plot,3531.029,,ITEX exp
+1,195,196,45-3E,449765.284,4434103.055,40.0556774,-105.5889831,45-3E,Marilyn Walker,manipulative plot,3530.412,,ITEX exp
+1,196,197,45-3C,449765.538,4434104.758,40.0556927,-105.5889802,45-3C,Marilyn Walker,manipulative plot,3529.954,,ITEX exp
+1,197,198,45-4E,449769.197,4434118.824,40.0558197,-105.5889384,45-4E,Marilyn Walker,manipulative plot,3529.386,,ITEX exp
+1,198,199,45-4C,449768.662,4434120.601,40.0558357,-105.5889448,45-4C,Marilyn Walker,manipulative plot,3529.264,,ITEX exp
+1,199,200,45-5E,449773.807,4434135.758,40.0559725,-105.5888857,45-5E,Marilyn Walker,manipulative plot,3528.57,,ITEX exp
+1,200,201,45-5C,449774.054,4434137.324,40.0559866,-105.5888829,45-5C,Marilyn Walker,manipulative plot,3528.616,,ITEX exp
+1,201,202,EP45-3E,449779.571,4434161.016,40.0562004,-105.5888201,EP45-3E,Marilyn Walker,manipulative plot,3527.472,,ITEX exp
+1,202,203,EP45-3C,449781.189,4434161.407,40.056204,-105.5888011,EP45-3C,Marilyn Walker,manipulative plot,3527.689,,ITEX exp
+1,203,204,EP75-3E,449808.625,4434153.375,40.0561333,-105.5884789,EP75-3E,Marilyn Walker,manipulative plot,3528.763,,ITEX exp
+1,204,205,EP75-3C,449810.575,4434153.755,40.0561368,-105.588456,EP75-3C,Marilyn Walker,manipulative plot,3527.952,,ITEX exp
+1,205,206,EP75-2E,449809.581,4434151.03,40.0561122,-105.5884675,EP75-2E,Marilyn Walker,manipulative plot,3528.545,,ITEX exp
+1,206,207,EP75-2C,449808.747,4434149.299,40.0560966,-105.5884771,EP75-2C,Marilyn Walker,manipulative plot,3528.522,,ITEX exp
+1,207,208,75-5C,449801.127,4434126.292,40.0558889,-105.5885647,75-5C,Marilyn Walker,manipulative plot,3529.749,,ITEX exp
+1,208,209,75-5E,449801.676,4434124.533,40.055873,-105.5885581,75-5E,Marilyn Walker,manipulative plot,3530.228,,ITEX exp
+1,209,210,75-4E,449801.08,4434122.549,40.0558551,-105.5885649,75-4E,Marilyn Walker,manipulative plot,3530.538,,ITEX exp
+1,210,211,75-4C,449800.513,4434121.147,40.0558425,-105.5885715,75-4C,Marilyn Walker,manipulative plot,3530.645,,ITEX exp
+1,211,212,75-3C,449795.472,4434105.931,40.0557051,-105.5886294,75-3C,Marilyn Walker,manipulative plot,3531.544,,ITEX exp
+1,212,213,75-3E,449796.439,4434104.414,40.0556915,-105.5886179,75-3E,Marilyn Walker,manipulative plot,3531.545,,ITEX exp
+1,213,214,75-2C,449794.874,4434103.131,40.0556798,-105.5886362,75-2C,Marilyn Walker,manipulative plot,3530.812,,ITEX exp
+1,214,215,75-2E,449795.737,4434101.357,40.0556639,-105.5886259,75-2E,Marilyn Walker,manipulative plot,3531.18,,ITEX exp
+1,215,216,75-1C,449790.879,4434086.056,40.0555258,-105.5886817,75-1C,Marilyn Walker,manipulative plot,3532.059,,ITEX exp
+1,216,217,75-1E,449791.556,4434084.424,40.0555111,-105.5886736,75-1E,Marilyn Walker,manipulative plot,3532.471,,ITEX exp
+1,217,218,EP75-1C,449787.335,4434074.681,40.0554231,-105.5887224,EP75-1C,Marilyn Walker,manipulative plot,3531.848,,ITEX exp
+1,218,219,PTQUAD09,449763.51,4433983.881,40.0546036,-105.5889946,Saddle Pt Quad 09,Marilyn Walker,observational plot,3527.382,,Point quadrat measurements at the saddle are made yearly
+1,219,220,PTQUAD19,449779.763,4434034.114,40.0550571,-105.588808,Saddle Pt Quad 19,Marilyn Walker,observational plot,3531.503,,Point quadrat measurements at the saddle are made yearly
+1,220,221,PTQUAD29,449791.142,4434079.66,40.0554681,-105.5886781,Saddle Pt Quad 29,Marilyn Walker,observational plot,3532.618,,Point quadrat measurements at the saddle are made yearly
+1,221,222,PTQUAD39,449804.699,4434131.505,40.055936,-105.5885232,Saddle Pt Quad 39,Marilyn Walker,observational plot,3530.201,,Point quadrat measurements at the saddle are made yearly
+1,222,223,PTQUAD49,449817.134,4434179.529,40.0563694,-105.5883811,Saddle Pt Quad 49,Marilyn Walker,observational plot,3526.632,,Point quadrat measurements at the saddle are made yearly
+1,223,224,PTQUAD59,449831.067,4434225.711,40.0567863,-105.5882213,Saddle Pt Quad 59,Marilyn Walker,observational plot,3524.259,,Point quadrat measurements at the saddle are made yearly
+1,224,225,PTQUAD69,449843.307,4434277.544,40.057254,-105.5880819,Saddle Pt Quad 69,Marilyn Walker,observational plot,3518.987,,Point quadrat measurements at the saddle are made yearly
+1,225,226,PTQUAD79,449856.599,4434324.87,40.0576812,-105.5879297,Saddle Pt Quad 79,Marilyn Walker,observational plot,3512.421,,Point quadrat measurements at the saddle are made yearly
+1,226,227,PTQUAD78,449810.279,4434332.9,40.0577508,-105.5884734,Saddle Pt Quad 78,Marilyn Walker,observational plot,3512.625,,Point quadrat measurements at the saddle are made yearly
+1,227,228,PTQUAD68,449794.383,4434289.291,40.057357,-105.5886564,Saddle Pt Quad 68,Marilyn Walker,observational plot,3516.923,,Point quadrat measurements at the saddle are made yearly
+1,228,229,PTQUAD58,449780.962,4434241.395,40.0569246,-105.58881,Saddle Pt Quad 58,Marilyn Walker,observational plot,3521.654,,Point quadrat measurements at the saddle are made yearly
+1,229,230,PTQUAD48,449769.916,4434193.895,40.0564961,-105.5889358,Saddle Pt Quad 48,Marilyn Walker,observational plot,3526.415,,Point quadrat measurements at the saddle are made yearly
+1,230,231,PTQUAD38,449753.522,4434143.463,40.0560407,-105.5891241,Saddle Pt Quad 38,Marilyn Walker,observational plot,3529.412,,Point quadrat measurements at the saddle are made yearly
+1,231,232,PTQUAD28,449743.862,4434096.679,40.0556187,-105.5892337,Saddle Pt Quad 28,Marilyn Walker,observational plot,3530.133,,Point quadrat measurements at the saddle are made yearly
+1,232,233,PTQUAD08,449721.138,4433996.594,40.0547156,-105.5894924,Saddle Pt Quad 08,Marilyn Walker,observational plot,3528.187,,Point quadrat measurements at the saddle are made yearly
+1,233,234,PTQUAD07,449666.367,4434012.591,40.0548565,-105.5901358,Saddle Pt Quad 07,Marilyn Walker,observational plot,3528.356,,Point quadrat measurements at the saddle are made yearly
+1,234,235,PTQUAD17,449683.632,4434061.565,40.0552987,-105.5899372,Saddle Pt Quad 17,Marilyn Walker,observational plot,3528.725,,Point quadrat measurements at the saddle are made yearly
+1,235,236,PTQUAD27,449691.537,4434110.033,40.0557358,-105.5898482,Saddle Pt Quad 27,Marilyn Walker,observational plot,3529.794,,Point quadrat measurements at the saddle are made yearly
+1,236,237,PTQUAD37,449708.622,4434156.915,40.0561592,-105.5896516,Saddle Pt Quad 37,Marilyn Walker,observational plot,3528.65,,Point quadrat measurements at the saddle are made yearly
+1,237,238,PTQUAD47,449716.92,4434205.667,40.0565989,-105.5895581,Saddle Pt Quad 47,Marilyn Walker,observational plot,3524.238,,Point quadrat measurements at the saddle are made yearly
+1,238,239,PTQUAD57,449734.226,4434251.054,40.0570089,-105.5893587,Saddle Pt Quad 57,Marilyn Walker,observational plot,3521.368,,Point quadrat measurements at the saddle are made yearly
+1,239,240,PTQUAD67,449746.595,4434303.451,40.0574817,-105.5892177,Saddle Pt Quad 67,Marilyn Walker,observational plot,3516.542,,Point quadrat measurements at the saddle are made yearly
+1,240,241,PTQUAD77,449761.34,4434352.605,40.0579254,-105.5890487,Saddle Pt Quad 77,Marilyn Walker,observational plot,3508.174,,Point quadrat measurements at the saddle are made yearly
+1,241,242,PTQUAD76,449705.757,4434354.48,40.057939,-105.5897005,Saddle Pt Quad 76,Marilyn Walker,observational plot,3510.757,,Point quadrat measurements at the saddle are made yearly
+1,242,243,PTQUAD66,449700.887,4434316.516,40.0575967,-105.5897547,Saddle Pt Quad 66,Marilyn Walker,observational plot,3515.337,,Point quadrat measurements at the saddle are made yearly
+1,243,244,PTQUAD56,449688.558,4434267.684,40.057156,-105.5898954,Saddle Pt Quad 56,Marilyn Walker,observational plot,3521.53,,Point quadrat measurements at the saddle are made yearly
+1,244,245,PTQUAD46,449674.524,4434219.531,40.0567213,-105.5900562,Saddle Pt Quad 46,Marilyn Walker,observational plot,3526.291,,Point quadrat measurements at the saddle are made yearly
+1,261,262,PTQUAD36,449660.974,4434167.519,40.0562519,-105.590211,Saddle Pt Quad 36,Marilyn Walker,observational plot,3531.278,,Point quadrat measurements at the saddle are made yearly
+1,262,263,PTQUAD26,449648.811,4434119.495,40.0558185,-105.5903499,Saddle Pt Quad 26,Marilyn Walker,observational plot,3532.565,,Point quadrat measurements at the saddle are made yearly
+1,263,264,PTQUAD16,449632.041,4434069.339,40.0553657,-105.5905426,Saddle Pt Quad 16,Marilyn Walker,observational plot,3532.149,,Point quadrat measurements at the saddle are made yearly
+1,264,265,PTQUAD06,449617.954,4434027.172,40.0549849,-105.5907045,Saddle Pt Quad 06,Marilyn Walker,observational plot,3531.087,,Point quadrat measurements at the saddle are made yearly
+1,265,266,PTQUAD05,449575.671,4434038.334,40.055083,-105.5912011,Saddle Pt Quad 05,Marilyn Walker,observational plot,3535.568,,Point quadrat measurements at the saddle are made yearly
+1,266,267,PTQUAD15,449588.012,4434086.683,40.0555193,-105.5910602,Saddle Pt Quad 15,Marilyn Walker,observational plot,3537.023,,Point quadrat measurements at the saddle are made yearly
+1,267,268,PTQUAD25,449600.06,4434129.317,40.0559041,-105.5909222,Saddle Pt Quad 25,Marilyn Walker,observational plot,3536.989,,Point quadrat measurements at the saddle are made yearly
+1,268,269,PTQUAD35,449608.007,4434179.75,40.056359,-105.590833,Saddle Pt Quad 35,Marilyn Walker,observational plot,3535.165,,Point quadrat measurements at the saddle are made yearly
+1,269,270,PTQUAD45,449628.025,4434227.103,40.0567868,-105.590602,Saddle Pt Quad 45,Marilyn Walker,observational plot,3532.384,,Point quadrat measurements at the saddle are made yearly
+1,270,271,PTQUAD55,449636.647,4434273.248,40.057203,-105.5905045,Saddle Pt Quad 55,Marilyn Walker,observational plot,3528.089,,Point quadrat measurements at the saddle are made yearly
+1,271,272,PTQUAD65,449645.04,4434328.263,40.0576992,-105.5904103,Saddle Pt Quad 65,Marilyn Walker,observational plot,3521.916,,Point quadrat measurements at the saddle are made yearly
+1,272,273,PTQUAD75,449665.971,4434368.91,40.0580666,-105.5901681,Saddle Pt Quad 75,Marilyn Walker,observational plot,3515.389,,Point quadrat measurements at the saddle are made yearly
+1,273,274,PTQUAD74,449616.102,4434383.287,40.0581931,-105.5907539,Saddle Pt Quad 74,Marilyn Walker,observational plot,3520.112,,Point quadrat measurements at the saddle are made yearly
+1,274,275,PTQUAD64,449605.476,4434342.179,40.0578222,-105.5908753,Saddle Pt Quad 64,Marilyn Walker,observational plot,3528.991,,Point quadrat measurements at the saddle are made yearly
+1,275,276,PTQUAD54,449586.733,4434292.821,40.0573764,-105.5910912,Saddle Pt Quad 54,Marilyn Walker,observational plot,3534.801,,Point quadrat measurements at the saddle are made yearly
+1,276,277,PTQUAD44,449574.337,4434240.693,40.056906,-105.5912325,Saddle Pt Quad 44,Marilyn Walker,observational plot,3539.18,,Point quadrat measurements at the saddle are made yearly
+1,277,278,PTQUAD34,449565.39,4434197.067,40.0565124,-105.591334,Saddle Pt Quad 34,Marilyn Walker,observational plot,3540.934,,Point quadrat measurements at the saddle are made yearly
+1,278,279,PTQUAD24,449555.425,4434141.605,40.0560121,-105.5914465,Saddle Pt Quad 24,Marilyn Walker,observational plot,3541.385,,Point quadrat measurements at the saddle are made yearly
+1,279,280,PTQUAD14,449534.828,4434100.893,40.0556441,-105.5916848,Saddle Pt Quad 14,Marilyn Walker,observational plot,3542.575,,Point quadrat measurements at the saddle are made yearly
+1,280,281,PTQUAD04,449528.105,4434050.12,40.0551863,-105.5917597,Saddle Pt Quad 04,Marilyn Walker,observational plot,3541.242,,Point quadrat measurements at the saddle are made yearly
+1,281,282,PTQUAD03,449481.473,4434065.079,40.0553183,-105.5923075,Saddle Pt Quad 03,Marilyn Walker,observational plot,3547.762,,Point quadrat measurements at the saddle are made yearly
+1,282,283,PTQUAD13,449491.772,4434110.921,40.0557319,-105.5921904,Saddle Pt Quad 13,Marilyn Walker,observational plot,3548.872,,Point quadrat measurements at the saddle are made yearly
+1,283,284,PTQUAD23,449505.608,4434158.994,40.0561658,-105.5920319,Saddle Pt Quad 23,Marilyn Walker,observational plot,3549.991,,Point quadrat measurements at the saddle are made yearly
+1,284,285,PTQUAD33,449520.161,4434208.878,40.0566161,-105.5918652,Saddle Pt Quad 33,Marilyn Walker,observational plot,3550.573,,Point quadrat measurements at the saddle are made yearly
+1,285,286,PTQUAD43,449524.596,4434258.369,40.0570623,-105.591817,Saddle Pt Quad 43,Marilyn Walker,observational plot,3548.2,,Point quadrat measurements at the saddle are made yearly
+1,286,287,PTQUAD53,449544.634,4434298.738,40.0574272,-105.5915852,Saddle Pt Quad 53,Marilyn Walker,observational plot,3542.168,,Point quadrat measurements at the saddle are made yearly
+1,287,288,PTQUAD63,449549.66,4434347.73,40.0578688,-105.5915301,Saddle Pt Quad 63,Marilyn Walker,observational plot,3537.267,,Point quadrat measurements at the saddle are made yearly
+1,288,289,PTQUAD73,449563.855,4434394.219,40.0582885,-105.5913673,Saddle Pt Quad 73,Marilyn Walker,observational plot,3528.616,,Point quadrat measurements at the saddle are made yearly
+1,309,310,PTQUAD12,449444.245,4434118.913,40.0558011,-105.5927482,Saddle Pt Quad 12,Marilyn Walker,observational plot,3558.653,,Point quadrat measurements at the saddle are made yearly
+1,310,311,PTQUAD22,449452.168,4434171.382,40.0562742,-105.5926594,Saddle Pt Quad 22,Marilyn Walker,observational plot,3561.683,,Point quadrat measurements at the saddle are made yearly
+1,311,312,PTQUAD32,449462.996,4434218.523,40.0566996,-105.5925361,Saddle Pt Quad 32,Marilyn Walker,observational plot,3561.285,,Point quadrat measurements at the saddle are made yearly
+1,312,313,PTQUAD42,449476.558,4434264.427,40.057114,-105.5923807,Saddle Pt Quad 42,Marilyn Walker,observational plot,3557.976,,Point quadrat measurements at the saddle are made yearly
+1,313,314,PTQUAD52,449489.738,4434312.286,40.0575459,-105.5922299,Saddle Pt Quad 52,Marilyn Walker,observational plot,3553.021,,Point quadrat measurements at the saddle are made yearly
+1,314,315,PTQUAD62,449501.029,4434365.555,40.0580265,-105.5921017,Saddle Pt Quad 62,Marilyn Walker,observational plot,3545.044,,Point quadrat measurements at the saddle are made yearly
+1,315,316,PTQUAD72,449524.693,4434406.953,40.0584009,-105.5918275,Saddle Pt Quad 72,Marilyn Walker,observational plot,3535.939,,Point quadrat measurements at the saddle are made yearly
+1,316,317,PTQUAD71,449467.082,4434425.485,40.0585644,-105.5925044,Saddle Pt Quad 71,Marilyn Walker,observational plot,3543.414,,Point quadrat measurements at the saddle are made yearly
+1,317,318,PTQUAD61,449462.857,4434378.369,40.0581397,-105.5925502,Saddle Pt Quad 61,Marilyn Walker,observational plot,3551.76,,Point quadrat measurements at the saddle are made yearly
+1,318,319,PTQUAD51,449440.049,4434325.188,40.0576592,-105.5928135,Saddle Pt Quad 51,Marilyn Walker,observational plot,3561.898,,Point quadrat measurements at the saddle are made yearly
+1,319,320,PTQUAD41,449437.307,4434281.227,40.057263,-105.5928422,Saddle Pt Quad 41,Marilyn Walker,observational plot,3566.349,,Point quadrat measurements at the saddle are made yearly
+1,320,321,PTQUAD31,449417.445,4434234.104,40.0568372,-105.5930714,Saddle Pt Quad 31,Marilyn Walker,observational plot,3571.115,,Point quadrat measurements at the saddle are made yearly
+1,321,322,PTQUAD21,449409.283,4434178.722,40.0563378,-105.5931628,Saddle Pt Quad 21,Marilyn Walker,observational plot,3570.988,,Point quadrat measurements at the saddle are made yearly
+1,322,323,PTQUAD11,449387.34,4434134.667,40.0559396,-105.5934166,Saddle Pt Quad 11,Marilyn Walker,observational plot,3569.739,,Point quadrat measurements at the saddle are made yearly
+1,323,324,PTQUAD01,449378.853,4434085.675,40.0554977,-105.5935123,Saddle Pt Quad 01,Marilyn Walker,observational plot,3565.484,,Point quadrat measurements at the saddle are made yearly
+1,513,514,EMAY16,449608.816,4434171.088,40.056281,-105.5908228,Ebert-May Plot 16,Diane Ebert-May,observational plot,3535.128,,vegetation cover plots
+1,514,515,EMAY16,449611.157,4434180.576,40.0563666,-105.5907961,Ebert-May Plot 16,Diane Ebert-May,observational plot,3534.894,,vegetation cover plots
+1,516,517,EMAY14,449684.957,4434142.293,40.0560261,-105.5899279,Ebert-May Plot 14,Diane Ebert-May,observational plot,3529.751,,vegetation cover plots
+1,517,518,EMAY14,449693.342,4434148.386,40.0560815,-105.5898301,Ebert-May Plot 14,Diane Ebert-May,observational plot,3529.636,,vegetation cover plots
+1,518,519,EMAY13,449702.164,4434134.223,40.0559544,-105.5897255,Ebert-May Plot 13,Diane Ebert-May,observational plot,3529.159,,vegetation cover plots
+1,519,520,EMAY13,449707.649,4434142.7,40.0560311,-105.5896619,Ebert-May Plot 13,Diane Ebert-May,observational plot,3528.765,,vegetation cover plots
+1,520,521,EMAY19,449622.219,4434219.895,40.0567215,-105.5906695,Ebert-May Plot 19,Diane Ebert-May,observational plot,3532.875,,vegetation cover plots
+1,521,522,EMAY19,449624.687,4434229.549,40.0568086,-105.5906413,Ebert-May Plot 19,Diane Ebert-May,observational plot,3532.679,,vegetation cover plots
+1,522,523,EMAY17,449561.991,4434240.227,40.0569011,-105.5913772,Ebert-May Plot 17,Diane Ebert-May,observational plot,3540.644,,vegetation cover plots
+1,523,524,EMAY17,449564.162,4434249.837,40.0569878,-105.5913525,Ebert-May Plot 17,Diane Ebert-May,observational plot,3540.776,,vegetation cover plots
+1,524,525,EMAY18,449535.135,4434259.351,40.0570717,-105.5916935,Ebert-May Plot 18,Diane Ebert-May,observational plot,3545.491,,vegetation cover plots
+1,525,526,EMAY18,449538.471,4434268.691,40.0571561,-105.5916552,Ebert-May Plot 18,Diane Ebert-May,observational plot,3544.458,,vegetation cover plots
+1,526,527,EMAY20,449702.586,4434300.654,40.0574539,-105.5897335,Ebert-May Plot 20,Diane Ebert-May,observational plot,3516.811,,vegetation cover plots
+1,527,528,EMAY20,449693.079,4434302.387,40.0574689,-105.5898451,Ebert-May Plot 20,Diane Ebert-May,observational plot,3517.329,,vegetation cover plots
+1,530,531,EMAY29,449773.758,4434106.188,40.0557061,-105.588884,Ebert-May Plot 29,Diane Ebert-May,observational plot,3531.109,,vegetation cover plots
+1,531,532,EMAY29,449780.524,4434098.642,40.0556385,-105.5888041,Ebert-May Plot 29,Diane Ebert-May,observational plot,3531.584,,vegetation cover plots
+1,532,533,EMAY12,449768.607,4434041.377,40.0551219,-105.5889393,Ebert-May Plot 12,Diane Ebert-May,observational plot,3531.889,,vegetation cover plots
+1,533,534,EMAY12,449769.512,4434031.712,40.0550349,-105.588928,Ebert-May Plot 12,Diane Ebert-May,observational plot,3531.645,,vegetation cover plots
+1,534,535,EMAY11,449721.878,4434027.566,40.0549947,-105.5894861,Ebert-May Plot 11,Diane Ebert-May,observational plot,3529.814,,vegetation cover plots
+1,535,536,EMAY11,449713.455,4434022.329,40.054947,-105.5895845,Ebert-May Plot 11,Diane Ebert-May,observational plot,3529.584,,vegetation cover plots
+1,536,537,EMAY15,449670.136,4434028.713,40.0550019,-105.5900928,Ebert-May Plot 15,Diane Ebert-May,observational plot,3529.08,,vegetation cover plots
+1,537,538,EMAY15,449661.125,4434025.304,40.0549707,-105.5901982,Ebert-May Plot 15,Diane Ebert-May,observational plot,3528.799,,vegetation cover plots
+1,538,539,EMAY09,449637.149,4434022.949,40.054948,-105.5904791,Ebert-May Plot 09,Diane Ebert-May,observational plot,3529.837,,vegetation cover plots
+1,539,540,EMAY09,449627.903,4434020.094,40.0549218,-105.5905873,Ebert-May Plot 09,Diane Ebert-May,observational plot,3530.158,,vegetation cover plots
+1,540,541,EMAY07,449609.3,4433954.669,40.0543312,-105.5908003,Ebert-May Plot 07,Diane Ebert-May,observational plot,3525.212,,vegetation cover plots
+1,541,542,EMAY07,449618.936,4433955.623,40.0543404,-105.5906874,Ebert-May Plot 07,Diane Ebert-May,observational plot,3524.976,,vegetation cover plots
+1,542,543,EMAY06,449620.58,4433947.523,40.0542675,-105.5906675,Ebert-May Plot 06,Diane Ebert-May,observational plot,3524.419,,vegetation cover plots
+1,543,544,EMAY06,449630.239,4433950.85,40.0542981,-105.5905545,Ebert-May Plot 06,Diane Ebert-May,observational plot,3524.923,,vegetation cover plots
+1,544,545,EMAY08,449629.601,4433974.726,40.0545131,-105.5905639,Ebert-May Plot 08,Diane Ebert-May,observational plot,3526.043,,vegetation cover plots
+1,545,546,EMAY08,449620.9,4433970.685,40.0544762,-105.5906655,Ebert-May Plot 08,Diane Ebert-May,observational plot,3526.107,,vegetation cover plots
+1,546,547,EMAY01,449805.848,4433959.369,40.0543853,-105.5884964,Ebert-May Plot 01,Diane Ebert-May,observational plot,3529.956,,vegetation cover plots
+1,547,548,EMAY01,449798.915,4433966.016,40.0544448,-105.5885782,Ebert-May Plot 01,Diane Ebert-May,observational plot,3529.661,,vegetation cover plots
+1,548,549,EMAY22,449848.473,4433925.473,40.0540825,-105.587994,Ebert-May Plot 22,Diane Ebert-May,observational plot,3530.705,,vegetation cover plots
+1,549,550,EMAY22,449839.393,4433922.974,40.0540594,-105.5881003,Ebert-May Plot 22,Diane Ebert-May,observational plot,3529.396,,vegetation cover plots
+1,550,551,EMAY25,449733.891,4434180.428,40.0563726,-105.5893571,Ebert-May Plot 25,Diane Ebert-May,observational plot,3527.189,,vegetation cover plots
+1,551,552,EMAY25,449732.516,4434190.179,40.0564603,-105.589374,Ebert-May Plot 25,Diane Ebert-May,observational plot,3526.658,,vegetation cover plots
+1,552,553,PTQUAD18,449727.045,4434048.314,40.0551819,-105.5894271,Saddle Pt Quad 18,Marilyn Walker,observational plot,3530.359,,Point quadrat measurements at the saddle are made yearly
+1,554,555,EMAY21,449947.016,4434032.659,40.055054,-105.586847,Ebert-May Plot 21,Diane Ebert-May,observational plot,3546.759,,vegetation cover plots
+1,558,559,EMAY28,449884.483,4434122.604,40.0558606,-105.5875871,Ebert-May Plot 28,Diane Ebert-May,observational plot,3538.066,,vegetation cover plots
+1,559,560,EMAY27,449873.255,4434105.872,40.0557092,-105.5877174,Ebert-May Plot 27,Diane Ebert-May,observational plot,3538.507,,vegetation cover plots
+1,565,566,EMAY32,449801.294,4434208.204,40.0566268,-105.588569,Ebert-May Plot 32,Diane Ebert-May,observational plot,3525.485,,vegetation cover plots
+1,566,567,EMAY26,449751.44,4434171.171,40.0562902,-105.5891507,Ebert-May Plot 26,Diane Ebert-May,observational plot,3527.885,,vegetation cover plots
+1,651,652,EMAY23,449665.554,4434066.884,40.0553456,-105.5901495,Ebert-May Plot 23,Diane Ebert-May,observational point,3531.197,,vegetation cover plots
+1,657,658,EMAY24,449726.359,4434167.902,40.0562593,-105.5894445,Ebert-May Plot 24,Diane Ebert-May,observational point,3527.321,,vegetation cover plots
+1,661,662,EMAY10,449692.619,4434024.496,40.0549653,-105.5898289,Ebert-May Plot 10,Diane Ebert-May,observational point,3529.175,,vegetation cover plots
+1,662,663,EMAY05,449679.156,4433942.797,40.0542284,-105.5899804,Ebert-May Plot 05,Diane Ebert-May,observational point,3522.423,,vegetation cover plots
+1,663,664,EMAY04,449692.248,4433954.1,40.0543311,-105.5898278,Ebert-May Plot 04,Diane Ebert-May,observational point,3523.131,,vegetation cover plots
+1,664,665,EMAY03,449699.567,4433929.763,40.0541122,-105.5897401,Ebert-May Plot 03,Diane Ebert-May,observational point,3521.019,,vegetation cover plots
+1,667,668,EMAY02,449737.851,4433936.288,40.0541733,-105.5892918,Ebert-May Plot 02,Diane Ebert-May,observational plot,3522.182,,vegetation cover plots
+1,690,691,PTQUAD02,449431.347,4434074.133,40.0553968,-105.5928959,Saddle Pt Quad 02,Marilyn Walker,observational plot,3555.614,,Point quadrat measurements at the saddle are made yearly
+1,691,692,EP25-1E,449740.4,4434080.349,40.0554713,-105.5892731,EP25-1E,Marilyn Walker,manipulative plot,3530.395,,Itex experiment
+1,692,693,EP75-1E,449787.698,4434076.633,40.0554407,-105.5887183,EP75-1E,Marilyn Walker,manipulative plot,3531.899,,Itex experiment
+1,896,897,Itex Bounding Coords,449686.896,4434616.561,40.060299,-105.589942,Itex Bounding Coordinates,Katie Suding,manipulative plot,NaN,,"Experimental manipulation of increased winter snowpack, nitrogen fertilization and summer temperature"
+1,897,898,Itex Bounding Coords,449729.256,4434612.285,40.060263,-105.589445,Itex Bounding Coordinates,Katie Suding,manipulative plot,NaN,,"Experimental manipulation of increased winter snowpack, nitrogen fertilization and summer temperature"
+1,898,899,Itex Bounding Coords,449706.103,4434670.601,40.060787,-105.589721,Itex Bounding Coordinates,Katie Suding,manipulative plot,NaN,,"Experimental manipulation of increased winter snowpack, nitrogen fertilization and summer temperature"
+1,899,900,Itex Bounding Coords,449709.914,4434602.09,40.06017,-105.589671,Itex Bounding Coordinates,Katie Suding,manipulative plot,NaN,,"Experimental manipulation of increased winter snowpack, nitrogen fertilization and summer temperature"

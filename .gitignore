@@ -1,6 +1,7 @@
 # History files
 .Rhistory
 .Rapp.history
+*.Rproj
 
 # Session Data files
 .RData
@@ -47,3 +48,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Large NEON files
+hyperspectral/data/NEON/*
