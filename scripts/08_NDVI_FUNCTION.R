@@ -337,9 +337,9 @@ run.mantel.spatial.ndvi <- function(saddle.years){
     i <- as.character(i)
     
     # Run mantel tests for all three combinations
-    mantel.nt <- mantel(matrices.ndvi[[i]], matrices.taxonomic[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.nf <- mantel(matrices.ndvi[[i]], matrices.functional[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.nb <- mantel(matrices.ndvi[[i]], matrices.biomass[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
+    mantel.nt <- mantel(matrices.ndvi[[i]], matrices.taxonomic[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.nf <- mantel(matrices.ndvi[[i]], matrices.functional[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.nb <- mantel(matrices.ndvi[[i]], matrices.biomass[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
     
     # Save outputs to list
     mantel.tests[[paste0("NDVI_Taxonomic_", i)]] <- mantel.nt
@@ -470,9 +470,9 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
                                                Diag = FALSE, Upper = FALSE, method = "user", class = "dist"))
 
       # Run mantel tests for all three combinations
-      mantel.nt <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.t, method = "spearman", permutations = 9999, na.rm = TRUE)
-      mantel.nf <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.f, method = "spearman", permutations = 9999, na.rm = TRUE)
-      mantel.nb <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.b, method = "spearman", permutations = 9999, na.rm = TRUE)
+      mantel.nt <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.t, method = "pearson", permutations = 9999, na.rm = TRUE)
+      mantel.nf <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.f, method = "pearson", permutations = 9999, na.rm = TRUE)
+      mantel.nb <- mantel(beta.temporal.matrix.n, beta.temporal.matrix.b, method = "pearson", permutations = 9999, na.rm = TRUE)
       
       # Save outputs to list
       mantel.tests[[paste0("NDVI_Taxonomic_", i)]] <- mantel.nt
@@ -522,7 +522,7 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
     mutate(Paired_Metrics = paste0(Matrix_1, ":", Matrix_2)) %>% 
     mutate(R2 = R_value^2) %>% 
     group_by(Paired_Metrics) %>% 
-    mutate(mean_R = round(mean(abs(R_value), na.rm = TRUE), digits = 3),
+    mutate(mean_R = round(mean(R_value, na.rm = TRUE), digits = 3),
            mean_R2 = round(mean(R2, na.rm = TRUE), digits = 3)) %>% 
     ungroup() %>% 
     dplyr::select(Paired_Metrics, mean_R, mean_R2) %>% 

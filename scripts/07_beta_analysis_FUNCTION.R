@@ -73,12 +73,12 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
     i <- as.character(i)
     
     # Run mantel tests for all six combinations
-    mantel.tf <- mantel(matrices.taxonomic[[i]], matrices.functional[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.tb <- mantel(matrices.taxonomic[[i]], matrices.biomass[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.ts <- mantel(matrices.taxonomic[[i]], matrices.spectral[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.fb <- mantel(matrices.functional[[i]], matrices.biomass[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.fs <- mantel(matrices.functional[[i]], matrices.spectral[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
-    mantel.bs <- mantel(matrices.biomass[[i]], matrices.spectral[[i]], method = "spearman", permutations = 9999, na.rm = TRUE)
+    mantel.tf <- mantel(matrices.taxonomic[[i]], matrices.functional[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.tb <- mantel(matrices.taxonomic[[i]], matrices.biomass[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.ts <- mantel(matrices.taxonomic[[i]], matrices.spectral[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.fb <- mantel(matrices.functional[[i]], matrices.biomass[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.fs <- mantel(matrices.functional[[i]], matrices.spectral[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
+    mantel.bs <- mantel(matrices.biomass[[i]], matrices.spectral[[i]], method = "pearson", permutations = 9999, na.rm = TRUE)
     
     # Save outputs to list
     mantel.tests[[paste0("Taxonomic_Functional_", i)]] <- mantel.tf
@@ -232,12 +232,12 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
                                                  Diag = FALSE, Upper = FALSE, method = "user", class = "dist"))
         
         # Run mantel tests on each two-metric permutation
-        mantel.tf <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.f, method = "spearman", permutations = 9999, na.rm = TRUE)
-        mantel.tb <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.b, method = "spearman", permutations = 9999, na.rm = TRUE)
-        mantel.ts <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.s, method = "spearman", permutations = 9999, na.rm = TRUE)
-        mantel.fb <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.b, method = "spearman", permutations = 9999, na.rm = TRUE)
-        mantel.fs <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.s, method = "spearman", permutations = 9999, na.rm = TRUE)
-        mantel.bs <- mantel(beta.temporal.matrix.b, beta.temporal.matrix.s, method = "spearman", permutations = 9999, na.rm = TRUE)
+        mantel.tf <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.f, method = "pearson", permutations = 9999, na.rm = TRUE)
+        mantel.tb <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.b, method = "pearson", permutations = 9999, na.rm = TRUE)
+        mantel.ts <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.s, method = "pearson", permutations = 9999, na.rm = TRUE)
+        mantel.fb <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.b, method = "pearson", permutations = 9999, na.rm = TRUE)
+        mantel.fs <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.s, method = "pearson", permutations = 9999, na.rm = TRUE)
+        mantel.bs <- mantel(beta.temporal.matrix.b, beta.temporal.matrix.s, method = "pearson", permutations = 9999, na.rm = TRUE)
         
         # Save outputs to list
         mantel.tests[[paste0("Taxonomic_Functional_", i)]] <- mantel.tf
@@ -301,9 +301,9 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
                                                Diag = FALSE, Upper = FALSE, method = "user", class = "dist"))
       
       # Run mantel tests on each two-metric permutation
-      mantel.tf <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.f, method = "spearman", permutations = 9999, na.rm = TRUE)
-      mantel.tb <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.b, method = "spearman", permutations = 9999, na.rm = TRUE)
-      mantel.fb <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.b, method = "spearman", permutations = 9999, na.rm = TRUE)
+      mantel.tf <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.f, method = "pearson", permutations = 9999, na.rm = TRUE)
+      mantel.tb <- mantel(beta.temporal.matrix.t, beta.temporal.matrix.b, method = "pearson", permutations = 9999, na.rm = TRUE)
+      mantel.fb <- mantel(beta.temporal.matrix.f, beta.temporal.matrix.b, method = "pearson", permutations = 9999, na.rm = TRUE)
       
       # Save outputs to list
       mantel.tests[[paste0("Taxonomic_Functional_", i)]] <- mantel.tf
@@ -344,7 +344,7 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
     mutate(Paired_Metrics = paste0(Matrix_1, ":", Matrix_2)) %>% 
     mutate(R2 = R_value^2) %>% 
     group_by(Paired_Metrics) %>% 
-    mutate(mean_R = round(mean(abs(R_value), na.rm = TRUE), digits = 3),
+    mutate(mean_R = round(mean(R_value, na.rm = TRUE), digits = 3),
            mean_R2 = round(mean(R2, na.rm = TRUE), digits = 3)) %>% 
     ungroup() %>% 
     dplyr::select(Paired_Metrics, mean_R, mean_R2) %>% 

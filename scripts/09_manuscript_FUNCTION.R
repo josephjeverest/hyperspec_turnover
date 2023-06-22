@@ -19,6 +19,16 @@ create.spatial.temporal.plots.spectral <- function(SpectralMetric, BetaMetric, S
   # Create a list to put the spatial plot outputs into
   spatial.plot.list <- list()
   
+  # Create dataframe for determining maximum axes values
+  axes.max.values <- SpatialData %>% 
+    dplyr::select(BetaMetric, SpectralMetric) %>% 
+    rename(BetaMetric = paste0(BetaMetric),
+           SpectralMetric = paste0(SpectralMetric))
+  
+  # Determine spatial axes maximums
+  x.max <- max(axes.max.values$BetaMetric, na.rm = TRUE) * 1.1
+  y.max <- max(axes.max.values$SpectralMetric, na.rm = TRUE) * 1.1
+  
   # Create loop counter
   spatial.plot.counter <- 0
   
@@ -51,8 +61,8 @@ create.spatial.temporal.plots.spectral <- function(SpectralMetric, BetaMetric, S
                  shape = 21, size = 2, alpha = 0.75, colour = "#000000", fill = dplyr::select(colour.palette, BetaMetric)[spatial.plot.counter, ]) +
       stat_smooth(data = input.data.spatial, aes(x = BetaMetric, y = SpectralMetric),
                   method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
-      scale_x_continuous(limits = c(0, max(input.data.spatial$BetaMetric)*1.1), expand = c(0,0)) +
-      scale_y_continuous(limits = c(0.0000000001, max(input.data.spatial$SpectralMetric)*1.1), expand = c(0,0)) +
+      scale_x_continuous(limits = c(0, x.max), expand = c(0,0)) +
+      scale_y_continuous(limits = c(0.0000000001, y.max), expand = c(0,0)) +
       labs(title = ifelse(Year == 2017, "         a) Spatial \n", "\n"),
            subtitle = paste0(Year),
            caption = paste0("\n R: ",
@@ -185,6 +195,16 @@ create.spatial.temporal.plots.NDVI <- function(SpectralMetric, BetaMetric, Spati
   # Create a list to put the spatial plot outputs into
   spatial.plot.list <- list()
   
+  # Create dataframe for determining maximum axes values
+  axes.max.values <- SpatialData %>% 
+    dplyr::select(BetaMetric, SpectralMetric) %>% 
+    rename(BetaMetric = paste0(BetaMetric),
+           SpectralMetric = paste0(SpectralMetric))
+  
+  # Determine spatial axes maximums
+  x.max <- max(axes.max.values$BetaMetric, na.rm = TRUE) * 1.1
+  y.max <- max(axes.max.values$SpectralMetric, na.rm = TRUE) * 1.1
+  
   # Create loop counter
   spatial.plot.counter <- 0
   
@@ -217,8 +237,8 @@ create.spatial.temporal.plots.NDVI <- function(SpectralMetric, BetaMetric, Spati
                  shape = 21, size = 2, alpha = 0.75, colour = "#000000", fill = dplyr::select(colour.palette, BetaMetric)[spatial.plot.counter, ]) +
       stat_smooth(data = input.data.spatial, aes(x = BetaMetric, y = SpectralMetric),
                   method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
-      scale_x_continuous(limits = c(0, max(input.data.spatial$BetaMetric)*1.1), expand = c(0,0)) +
-      scale_y_continuous(limits = c(0.0000000001, max(input.data.spatial$SpectralMetric)*1.1), expand = c(0,0)) +
+      scale_x_continuous(limits = c(0, x.max), expand = c(0,0)) +
+      scale_y_continuous(limits = c(0.0000000001, y.max), expand = c(0,0)) +
       labs(title = ifelse(Year == 2017, "         a) Spatial \n", "\n"),
            subtitle = paste0(Year),
            caption = paste0("\n R: ",
