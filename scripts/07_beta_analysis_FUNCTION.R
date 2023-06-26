@@ -338,6 +338,9 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
     
   } # End of plot loop
   
+  # Export full output for later plotting
+  write.csv(mantel.output, file = paste0("outputs/output_complete_statistics_PCA_temporal_", spectral.metric, filepath.37, filepath.top.hits, ".csv"),
+            row.names = FALSE)
   
   # Create tidy dataframe output with mean values
   mantel.output.tidy <- mantel.output %>% 

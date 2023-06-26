@@ -159,7 +159,44 @@ calc.beta.taxonomic.temporal <- function(composition.year.pairs, composition.plo
    
      
   } # End of pairwise year loop
+  
+  # Determine how many plots are in the original input dataframe
+  plot.num.input <- length(unique(composition.traits$PLOT))
+  
+  # Determine how many plots are in the output dataframe
+  plot.num.output <- length(unique(taxonomic.output.df$Plot))
+  
+  # Determine if same number of plots
+  plot.num.check <- ifelse(length(unique(composition.traits$PLOT)) == 
+                             length(unique(taxonomic.output.df$Plot)),
+                           TRUE, FALSE)
+  
+  # Add if statement to add row for missing plot
+  if (plot.num.check == FALSE){
     
+    
+    # Determine which plot is missing
+    plot.num.missing <- as.numeric(setdiff(unique(composition.traits$PLOT),
+                                           unique(taxonomic.output.df$Plot)))
+    
+    # Add row for each year pair
+    for (k in composition.year.pairs){
+      
+      
+      # Create row with dissimilarity = 0 (for when plots are identical, function leaves them out)
+      plot.num.input <- data.frame("Plot" = plot.num.missing,
+                                   "Years" = k,
+                                   "Type" = "Taxonomic",
+                                   "Method" = "Bray-Curtis",
+                                   "Dissimilarity" = 0)
+      
+      # Append to main output
+      taxonomic.output.df <- rbind(taxonomic.output.df, plot.num.input) %>% 
+        arrange(Plot)
+
+    } # End of for loop
+
+  } # End of if statement
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
   write.csv(taxonomic.output.df, file = paste0("outputs/output_beta_taxonomic_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)

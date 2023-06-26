@@ -516,6 +516,9 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
     
   } # End of plot loop
   
+  # Export full output for later plotting
+  write.csv(mantel.output, file = paste0("outputs/output_complete_statistics_temporal_ndvi.csv"),
+            row.names = FALSE)
   
   # Create tidy dataframe output with mean values
   mantel.output.tidy <- mantel.output %>% 

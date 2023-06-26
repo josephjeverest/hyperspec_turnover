@@ -110,32 +110,48 @@ create.spatial.temporal.plots.spectral <- function(SpectralMetric, BetaMetric, S
                                     spatial.plot.list[[3]], spatial.plot.list[[4]],
                                     ncol = 2)
   
-  # Create dataframe of temporal data
+  # Create dataframe of temporal data - NEW STYLE (histogram)
   input.data.temporal <- TemporalData %>% 
-    dplyr::select(BetaMetric, SpectralMetric, timeframe) %>% 
-    rename(BetaMetric = paste0(BetaMetric),
-           SpectralMetric = paste0(SpectralMetric))
+    mutate(Matrix_2 = ifelse(Matrix_2 == "Spectral_PCA", "Spectral", Matrix_2)) %>% 
+    filter(Matrix_2 == paste0(SpectralMetric),
+           Matrix_1 == paste0(BetaMetric))
   
+  # Determine the mean R value
+  mean.temporal.R <- mean(input.data.temporal$R_value, na.rm = TRUE)
   
-  # Plot the temporal panel
+  # Plot temporal panel - NEW STYLE (histogram)
   (temporal.plot <- ggplot() +
-      geom_point(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric, fill = timeframe),
-                 shape = 21, size = 2, alpha = 0.75, colour = "#000000") +
-      stat_smooth(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric),
-                  method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
-      scale_fill_manual(values = dplyr::select(colour.palette, BetaMetric)[1:3,]) +
-      scale_x_continuous(limits = c(0, max(input.data.temporal$BetaMetric)*1.1), expand = c(0,0)) +
-      scale_y_continuous(limits = c(0.000000000001, max(input.data.temporal$SpectralMetric)*1.1), expand = c(0,0)) +
+      geom_histogram(data = input.data.temporal, aes(x = R_value), colour = "#000000",
+                     alpha = 0.75, fill = dplyr::select(colour.palette, BetaMetric)[3,],
+                     binwidth = 0.2) +
+      geom_vline(aes(xintercept = mean.temporal.R), colour = "#000000", size = 0.5, linetype = "dashed") +
       labs(title = "         b) Temporal \n",
            subtitle = "2017 ~ 2020",
-           caption = paste0("\n R: ", round(filter(TemporalStatisticsData,
-                                                   Paired_Metrics == paste0(BetaMetric, ":", SpectralMetric, "_PCA"))$mean_R, digits = 3)),
+           caption = paste0("\nR: ", round(mean.temporal.R, digits = 3)),
            x = paste0("\n", BetaMetric, ifelse(BetaMetric %in% c("Taxonomic", "Functional"), " Dissimilarity", " Difference")),
-           y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n"),
-           fill = "Pariwise\nInterval\n(Years)") +
-      theme_ms() +
-      theme(legend.position = "right"))
+           y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n")) +
+      theme_ms()
+  )
   
+  # # Plot the temporal panel
+  # (temporal.plot <- ggplot() +
+  #     geom_point(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric, fill = timeframe),
+  #                shape = 21, size = 2, alpha = 0.75, colour = "#000000") +
+  #     stat_smooth(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric),
+  #                 method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
+  #     scale_fill_manual(values = dplyr::select(colour.palette, BetaMetric)[1:3,]) +
+  #     scale_x_continuous(limits = c(0, max(input.data.temporal$BetaMetric)*1.1), expand = c(0,0)) +
+  #     scale_y_continuous(limits = c(0.000000000001, max(input.data.temporal$SpectralMetric)*1.1), expand = c(0,0)) +
+  #     labs(title = "         b) Temporal \n",
+  #          subtitle = "2017 ~ 2020",
+  #          caption = paste0("\n R: ", round(filter(TemporalStatisticsData,
+  #                                                  Paired_Metrics == paste0(BetaMetric, ":", SpectralMetric, "_PCA"))$mean_R, digits = 3)),
+  #          x = paste0("\n", BetaMetric, ifelse(BetaMetric %in% c("Taxonomic", "Functional"), " Dissimilarity", " Difference")),
+  #          y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n"),
+  #          fill = "Pariwise\nInterval\n(Years)") +
+  #     theme_ms() +
+  #     theme(legend.position = "right"))
+
   # Create blank plot for panel
   blank.plot <- grid::grid.rect(gp = grid::gpar(col = "white"))
   
@@ -161,12 +177,12 @@ create.spatial.temporal.plots.spectral <- function(SpectralMetric, BetaMetric, S
   
   # Export plot
   ggsave(combined.panel.trio,
-         width = 20, height = 12,
+         width = 21, height = 12,
          filename = paste0("outputs/figures/manuscript/fig_", BetaMetric,
                            "_", SpectralMetric, "_trio", filepath.37, filepath.top.hits, ".png"))
   
   ggsave(combined.panel.five,
-         width = 22, height = 5,
+         width = 23, height = 5.4,
          filename = paste0("outputs/figures/manuscript/fig_", BetaMetric,
                            "_", SpectralMetric, "_five", filepath.37, filepath.top.hits, ".png"))
 
@@ -286,31 +302,45 @@ create.spatial.temporal.plots.NDVI <- function(SpectralMetric, BetaMetric, Spati
                                     spatial.plot.list[[3]], spatial.plot.list[[4]],
                                     ncol = 2)
   
-  # Create dataframe of temporal data
+  # Create dataframe of temporal data - NEW STYLE (histogram)
   input.data.temporal <- TemporalData %>% 
-    dplyr::select(BetaMetric, SpectralMetric, timeframe) %>% 
-    rename(BetaMetric = paste0(BetaMetric),
-           SpectralMetric = paste0(SpectralMetric))
+    filter(Matrix_2 == paste0(BetaMetric))
   
+  # Determine the mean R value
+  mean.temporal.R <- mean(input.data.temporal$R_value, na.rm = TRUE)
   
-  # Plot the temporal panel
+  # Plot temporal panel - NEW STYLE (histogram)
   (temporal.plot <- ggplot() +
-      geom_point(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric, fill = timeframe),
-                 shape = 21, size = 2, alpha = 0.75, colour = "#000000") +
-      stat_smooth(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric),
-                  method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
-      scale_fill_manual(values = dplyr::select(colour.palette, BetaMetric)[1:3,]) +
-      scale_x_continuous(limits = c(0, max(input.data.temporal$BetaMetric)*1.1), expand = c(0,0)) +
-      scale_y_continuous(limits = c(0.000000000001, max(input.data.temporal$SpectralMetric)*1.1), expand = c(0,0)) +
+      geom_histogram(data = input.data.temporal, aes(x = R_value), colour = "#000000",
+                     alpha = 0.75, fill = dplyr::select(colour.palette, BetaMetric)[3,],
+                     binwidth = 0.2) +
+      geom_vline(aes(xintercept = mean.temporal.R), colour = "#000000", size = 0.5, linetype = "dashed") +
       labs(title = "         b) Temporal \n",
            subtitle = "2017 ~ 2020",
-           caption = paste0("\n R: ", round(filter(TemporalStatisticsData,
-                                                   Paired_Metrics == paste0(SpectralMetric, ":", BetaMetric))$mean_R, digits = 3)),
+           caption = paste0("\nR: ", round(mean.temporal.R, digits = 3)),
            x = paste0("\n", BetaMetric, ifelse(BetaMetric %in% c("Taxonomic", "Functional"), " Dissimilarity", " Difference")),
-           y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n"),
-           fill = "Pariwise\nInterval\n(Years)") +
-      theme_ms() +
-      theme(legend.position = "right"))
+           y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n")) +
+      theme_ms()
+  )
+  
+  # # Plot the temporal panel - OLD STYLE (scatterplot)
+  # (temporal.plot <- ggplot() +
+  #     geom_point(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric, fill = timeframe),
+  #                shape = 21, size = 2, alpha = 0.75, colour = "#000000") +
+  #     stat_smooth(data = input.data.temporal, aes(x = BetaMetric, y = SpectralMetric),
+  #                 method = lm, colour = "#000000", alpha = 1, se = FALSE, linetype = "solid") +
+  #     scale_fill_manual(values = dplyr::select(colour.palette, BetaMetric)[1:3,]) +
+  #     scale_x_continuous(limits = c(0, max(input.data.temporal$BetaMetric)*1.1), expand = c(0,0)) +
+  #     scale_y_continuous(limits = c(0.000000000001, max(input.data.temporal$SpectralMetric)*1.1), expand = c(0,0)) +
+  #     labs(title = "         b) Temporal \n",
+  #          subtitle = "2017 ~ 2020",
+  #          caption = paste0("\n R: ", round(filter(TemporalStatisticsData,
+  #                                                  Paired_Metrics == paste0(SpectralMetric, ":", BetaMetric))$mean_R, digits = 3)),
+  #          x = paste0("\n", BetaMetric, ifelse(BetaMetric %in% c("Taxonomic", "Functional"), " Dissimilarity", " Difference")),
+  #          y = paste0(SpectralMetric, ifelse(SpectralMetric == "Spectral", " Dissimilarity", " Difference"), "\n"),
+  #          fill = "Pariwise\nInterval\n(Years)") +
+  #     theme_ms() +
+  #     theme(legend.position = "right"))
   
   # Create blank plot for panel
   blank.plot <- grid::grid.rect(gp = grid::gpar(col = "white"))
@@ -337,12 +367,12 @@ create.spatial.temporal.plots.NDVI <- function(SpectralMetric, BetaMetric, Spati
   
   # Export plot
   ggsave(combined.panel.trio,
-         width = 20, height = 12,
+         width = 21, height = 12,
          filename = paste0("outputs/figures/manuscript/fig_", BetaMetric,
                            "_", SpectralMetric, "_trio.png"))
   
   ggsave(combined.panel.five,
-         width = 22, height = 5,
+         width = 23, height = 5.4,
          filename = paste0("outputs/figures/manuscript/fig_", BetaMetric,
                            "_", SpectralMetric, "_five.png"))
   

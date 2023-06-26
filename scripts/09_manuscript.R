@@ -289,8 +289,10 @@ count.temporal <- beta.temporal %>%
 # Load in statistics
 statistics.spatial <- read.csv(paste0("outputs/output_statistics_PCA_spatial_Euclidean", filepath.37, filepath.top.hits, ".csv"))
 statistics.temporal <- read.csv(paste0("outputs/output_statistics_PCA_temporal_Euclidean", filepath.37, filepath.top.hits, ".csv"))
+statistics.temporal.indiv <- read.csv(paste0("outputs/output_complete_statistics_PCA_temporal_Euclidean", filepath.37, filepath.top.hits, ".csv"))
 statistics.ndvi.spatial <- read.csv("outputs/output_statistics_spatial_ndvi.csv")
 statistics.ndvi.temporal <- read.csv("outputs/output_statistics_temporal_ndvi.csv")
+statistics.ndvi.temporal.indiv <- read.csv(paste0("outputs/output_complete_statistics_temporal_ndvi.csv"))
 
 # Modify NDVI dataframes
 plot.ndvi.spatial <- beta.ndvi.spatial %>% 
@@ -422,7 +424,7 @@ for (a in c("Functional", "Taxonomic", "Biomass")){
   create.spatial.temporal.plots.spectral(SpectralMetric = "Spectral",
                                          BetaMetric = a,
                                          SpatialData = plot.spatial,
-                                         TemporalData = plot.temporal,
+                                         TemporalData = statistics.temporal.indiv,
                                          SpatialStatisticsData = statistics.spatial,
                                          TemporalStatisticsData = statistics.temporal)
 
@@ -435,7 +437,7 @@ for (a in c("Functional", "Taxonomic", "Biomass")){
   create.spatial.temporal.plots.NDVI(SpectralMetric = "NDVI",
                                      BetaMetric = a,
                                      SpatialData = plot.spatial,
-                                     TemporalData = plot.temporal,
+                                     TemporalData = statistics.ndvi.temporal.indiv,
                                      SpatialStatisticsData = statistics.ndvi.spatial,
                                      TemporalStatisticsData = statistics.ndvi.temporal)
 
