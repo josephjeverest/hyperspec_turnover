@@ -1,6 +1,6 @@
 # 01 - Saddle Composition Data
 # Joseph Everest
-# February 2023, modified March 2023
+# February 2023, modified March 2023, September 2023
 
 
 # LOAD PACKAGES ----
@@ -11,13 +11,7 @@ library(Taxonstand)
 library(sp)
 
 
-# ADD DIRECTORY: OUTPUTS ----
-
-# Add directory for all outputs
-dir.create("outputs")
-
-
-# **[CHANGE]** - DECIDE WHETHER TO USE ALL HITS OR TOP HITS ONLY ----
+# **[CHANGE]** - DECIDE WHETHER TO USE TOP HITS ONLY OR NOT ----
 
 # Decision
 top.hits.only <- "No" # Default = "No"
@@ -29,7 +23,7 @@ if (top.hits.only == "No"){ filepath.top.hits <- "" } else { filepath.top.hits <
 # IMPORT DATA (saddle.1) ----
 
 # Load saddle composition data
-saddle.1 <- read.csv("data/nwt_composition.csv")
+saddle.1 <- read.csv("data/saddptqd.hh.data.csv")
 
 
 # DATA MANIPULATION (saddle.2) ----
@@ -98,7 +92,7 @@ coords.full <- left_join(coords.old, coords.new, by = c("SITECODE" = "PLOT")) %>
   arrange(desc(TOTAL_dif))
 
 # Export the locations and differences between old and new measurements
-write.csv(coords.full, file = "outputs/output_saddle_locations_full.csv", row.names = FALSE)
+write.csv(coords.full, file = paste0("outputs/output_saddle_locations_full.csv"), row.names = FALSE)
 
 # Trim down coordinates for joining with composition data
 locations <- coords.full %>% 
@@ -123,7 +117,7 @@ saddle.3 <- saddle.2b %>%
 # PLOT TYPE (saddle.4) ----
 
 # Load in saddle NPP dataset which has veg class per plot
-veg.class.1 <- read.csv("data/nwt_biomass.csv")
+veg.class.1 <- read.csv("data/saddgrid_npp.hh.data.csv")
 
   # NOTE: 81 of 88 plots present
     # MISSING: 1, 13, 41, 42, 63, 71, 301
@@ -172,7 +166,7 @@ species.saddle <- unique(saddle.4$USDA_name)
 # write.csv(species.checked, "outputs/output_tpl_saddle.csv")
 
 # Read csv of taxonomy checker results and trim dataframe
-species.checked <- read.csv("outputs/output_tpl_saddle.csv") %>% 
+species.checked <- read.csv(paste0("outputs/output_tpl_saddle.csv")) %>% 
   dplyr::select(Taxon, New.Genus, New.Species, New.Taxonomic.status, Family) %>%
   mutate(Name_TPL = paste(New.Genus, New.Species, sep = " ")) %>%
   relocate(Name_TPL, New.Genus, Family, .before = New.Taxonomic.status) %>%
@@ -255,7 +249,7 @@ saddle.5 <- left_join(saddle.4, species.checked.t, by = c("USDA_name" = "Taxon")
 # ADD GROWTH FORM (saddle.6) ----
 
 # Add dataset of growth forms for species
-growth.forms.1 <- read.csv("data/itex_growth-forms.csv", stringsAsFactors = FALSE) %>% 
+growth.forms.1 <- read.csv("data/TVC_SPP_20120502.csv", stringsAsFactors = FALSE) %>% 
   dplyr::select(-X)
 
 # Create dataframe containing ITEX site genus, species, and growth forms
@@ -384,23 +378,17 @@ pin.hits <- saddle.6a %>%
 # No more edits required
 saddle.7 <- saddle.6a
 
-
-# PLOT CHECKS (saddle.8) ----
-
 # Check that we have the same number of plots in every year
 top.hits.checks <- saddle.7 %>% 
   group_by(year) %>% 
   summarise(num_plots = length(unique(plot))) %>% # 86 in all years
   ungroup()
 
-# Carry over saddle.7 as saddle.8
-saddle.8 <- saddle.7
 
-
-# FINAL TIDY (saddle.9) ----
+# FINAL TIDY (saddle.8) ----
 
 # Re-add in columns for site and subsite etc. and cut to 2017-2020
-saddle.9 <- saddle.8 %>% 
+saddle.8 <- saddle.7 %>% 
   mutate(SITE = "NIWOT",
          SUBSITE = "SADDLE_GRID") %>% 
   rename(PLOT = plot, YEAR = year, CLASS = veg_class, FuncGroup = GROWTH_FORM) %>% 
@@ -414,7 +402,7 @@ saddle.9 <- saddle.8 %>%
 if (top.hits.only == "Yes"){
   
   # Convert all pins with only a single hit to 'top hits'
-  saddle.top.hits.only <- saddle.9 %>%
+  saddle.top.hits.only <- saddle.8 %>%
     group_by(PlotYear, x, y) %>%
     mutate(num_hits = length(hit_type)) %>%
     ungroup() %>%
@@ -429,12 +417,12 @@ if (top.hits.only == "Yes"){
     ungroup()
   
   # All correct so assign object forward
-  saddle.10 <- saddle.top.hits.only
+  saddle.9 <- saddle.top.hits.only
   
 } else {
   
   # Carry forward original saddle.9
-  saddle.10 <- saddle.9
+  saddle.9 <- saddle.8
   
 } # End of top.hits.only if statement
 
@@ -442,14 +430,13 @@ if (top.hits.only == "Yes"){
 # EXPORT CLEANED SADDLE DATAFRAME ----
 
 # Export dataframe to csv
-write.csv(saddle.10, file = paste0("outputs/output_saddle_composition", filepath.top.hits, ".csv"),
-          row.names = FALSE)
+write.csv(saddle.9, file = paste0("outputs/output_saddle_composition", filepath.top.hits, ".csv"), row.names = FALSE)
 
 
 # CALCULATE COVER (saddle.9) ----
 
 # Remove any rows that are classes as 'non-vasc. plant material'
-cover.vasc <- saddle.10 %>% 
+cover.vasc <- saddle.9 %>% 
   filter(SPECIES != "NON-VASC. PLANT MATERIAL")
 
 # Calculate cover for each plot
@@ -497,7 +484,7 @@ cover.fg.key <- cover.fg %>%
 cover.final <- left_join(cover.cut, cover.fg.key, by = c("PlotYear" = "PlotYear"))
 
 # Tidy up dataframe
-saddle.11 <- cover.final %>% 
+saddle.10 <- cover.final %>% 
   dplyr::select(-c(total_hits, species_hits)) %>% 
   group_by(PlotYear) %>% 
   mutate(SpeciesRichness = length(unique(SPECIES))) %>% 
@@ -508,5 +495,4 @@ saddle.11 <- cover.final %>%
 # EXPORT COVER SADDLE DATAFRAME ----
 
 # Export dataframe to csv
-write.csv(saddle.11, file = paste0("outputs/output_saddle_cover", filepath.top.hits, ".csv"),
-          row.names = FALSE)
+write.csv(saddle.10, file = paste0("outputs/output_saddle_cover", filepath.top.hits, ".csv"), row.names = FALSE)

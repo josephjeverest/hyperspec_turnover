@@ -1,6 +1,20 @@
 # 05a - Functions for calculating Beta Diversity - Taxonomic, Functional & Spectral
 # Joseph Everest
-# February 2023, adapted April 2023, May 2023
+# February 2023, modified April 2023, May 2023, September 2023
+
+
+# LOAD PACKAGES & THEMES ----
+
+# Load packages
+library(tidyverse)
+library(viridis)
+library(gridExtra)
+library(reshape2)
+library(vegan)
+library(biotools)
+
+# Load themes
+source("hyperspectral/scripts/EX1_ggplot_themes.R")
 
 
 # FUNCTION: TAXONOMIC BETA DIVERSTIY (BRAY-CURTIS) - SPATIAL ----
@@ -83,10 +97,12 @@ calc.beta.taxonomic.spatial <- function(composition.years){
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(taxonomic.output.df, file = paste0("outputs/output_beta_taxonomic_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(taxonomic.output.df, file = paste0("outputs/output_beta_taxonomic_spatial", filepath.brightness,
+                                               filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export list of Bray-Curtis dissimilarity across all years
-  save(taxonomic.output.list, file = paste0("outputs/output_beta_taxonomic_spatial", filepath.37, filepath.top.hits, ".RData"))
+  save(taxonomic.output.list, file = paste0("outputs/output_beta_taxonomic_spatial", filepath.brightness,
+                                            filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
   
   # Remove intermediate objects
   rm(taxonomic.output.list, taxonomic.output.df)
@@ -142,7 +158,7 @@ calc.beta.taxonomic.temporal <- function(composition.year.pairs, composition.plo
       
       # Add in supporting information
       composition.bc.3 <- composition.bc.2 %>% 
-        mutate(Plot = i,
+        mutate(PLOT = i,
                Years = j,
                Type = "Taxonomic",
                Method = "Bray-Curtis") %>% 
@@ -164,11 +180,11 @@ calc.beta.taxonomic.temporal <- function(composition.year.pairs, composition.plo
   plot.num.input <- length(unique(composition.traits$PLOT))
   
   # Determine how many plots are in the output dataframe
-  plot.num.output <- length(unique(taxonomic.output.df$Plot))
+  plot.num.output <- length(unique(taxonomic.output.df$PLOT))
   
   # Determine if same number of plots
   plot.num.check <- ifelse(length(unique(composition.traits$PLOT)) == 
-                             length(unique(taxonomic.output.df$Plot)),
+                             length(unique(taxonomic.output.df$PLOT)),
                            TRUE, FALSE)
   
   # Add if statement to add row for missing plot
@@ -177,14 +193,14 @@ calc.beta.taxonomic.temporal <- function(composition.year.pairs, composition.plo
     
     # Determine which plot is missing
     plot.num.missing <- as.numeric(setdiff(unique(composition.traits$PLOT),
-                                           unique(taxonomic.output.df$Plot)))
+                                           unique(taxonomic.output.df$PLOT)))
     
     # Add row for each year pair
     for (k in composition.year.pairs){
       
       
       # Create row with dissimilarity = 0 (for when plots are identical, function leaves them out)
-      plot.num.input <- data.frame("Plot" = plot.num.missing,
+      plot.num.input <- data.frame("PLOT" = plot.num.missing,
                                    "Years" = k,
                                    "Type" = "Taxonomic",
                                    "Method" = "Bray-Curtis",
@@ -192,14 +208,18 @@ calc.beta.taxonomic.temporal <- function(composition.year.pairs, composition.plo
       
       # Append to main output
       taxonomic.output.df <- rbind(taxonomic.output.df, plot.num.input) %>% 
-        arrange(Plot)
-
+        arrange(PLOT)
+      
+      
     } # End of for loop
-
+    
+    
   } # End of if statement
   
+
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(taxonomic.output.df, file = paste0("outputs/output_beta_taxonomic_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(taxonomic.output.df, file = paste0("outputs/output_beta_taxonomic_temporal", filepath.brightness,
+                                               filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(taxonomic.output.df)
@@ -216,7 +236,7 @@ calc.beta.functional.spatial <- function(composition.years){
   
   
   # Import functional dissimilarity functions
-  source("scripts/EX2_adiv_functions.txt")
+  source("scripts/EX1_adiv_functions.txt")
   
   # Create empty dataframe for assimilating dissimilarity matrix outputs as dataframes
   functional.output.df <- data.frame()
@@ -305,10 +325,12 @@ calc.beta.functional.spatial <- function(composition.years){
   
   
   # Export dataframe of functional dissimilarity across all years
-  write.csv(functional.output.df, file = paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(functional.output.df, file = paste0("outputs/output_beta_functional_spatial", filepath.brightness,
+                                                filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export list of functional dissimilarity across all years
-  save(functional.output.list, file = paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".RData"))
+  save(functional.output.list, file = paste0("outputs/output_beta_functional_spatial", filepath.brightness,
+                                             filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
   
   # Remove intermediate objects
   rm(functional.output.list, functional.output.df)
@@ -326,7 +348,7 @@ calc.beta.functional.temporal <- function(composition.year.pairs, composition.pl
   
   
   # Import functional dissimilarity functions
-  source("scripts/EX2_adiv_functions.txt")
+  source("scripts/EX1_adiv_functions.txt")
   
   # Create empty dataframe for assimilating dissimilarity matrix outputs as dataframes
   functional.output.df <- data.frame()
@@ -401,7 +423,7 @@ calc.beta.functional.temporal <- function(composition.year.pairs, composition.pl
         
         # Add in supporting information
         functional.ds.3 <- functional.ds.2 %>% 
-          mutate(Plot = i,
+          mutate(PLOT = i,
                  Years = j,
                  Type = "Functional",
                  Method = "FDis") %>% 
@@ -415,7 +437,7 @@ calc.beta.functional.temporal <- function(composition.year.pairs, composition.pl
         
         
         # Generate row output to append to dataframe
-        functional.ds.single.species <- data.frame("Plot" = i,
+        functional.ds.single.species <- data.frame("PLOT" = i,
                                                    "Years" = j,
                                                    "Type" = "Functional",
                                                    "Method" = "FDis",
@@ -440,7 +462,8 @@ calc.beta.functional.temporal <- function(composition.year.pairs, composition.pl
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(functional.output.df, file = paste0("outputs/output_beta_functional_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(functional.output.df, file = paste0("outputs/output_beta_functional_temporal", filepath.brightness,
+                                                filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(functional.output.df)
@@ -470,7 +493,7 @@ calc.beta.biomass.spatial <- function(composition.years){
     
     # Create a key of the plots to row numbers
     biomass.key <- biomass.cut %>%
-      dplyr::select(Plot) %>% 
+      dplyr::select(PLOT) %>% 
       mutate(ID = as.numeric(row.names(.)))    
     
     # Create input dataframe for Euclidean distance calculations
@@ -501,9 +524,9 @@ calc.beta.biomass.spatial <- function(composition.years){
     
     # Rename to actual plot numbers and prepare output for combination with other dataframes
     biomass.distance.4 <- left_join(biomass.distance.3, biomass.key, by = c("minPlotID" = "ID")) %>% 
-      rename(PLOT_1 = Plot) %>% 
+      rename(PLOT_1 = PLOT) %>% 
       left_join(., biomass.key, by = c("maxPlotID" = "ID")) %>%
-      rename(PLOT_2 = Plot) %>% 
+      rename(PLOT_2 = PLOT) %>% 
       dplyr::select(-c(minPlotID, maxPlotID)) %>% 
       mutate(Year = i,
              Type = "Biomass",
@@ -519,10 +542,12 @@ calc.beta.biomass.spatial <- function(composition.years){
   
   
   # Export dataframe of spectral distance across all years
-  write.csv(biomass.output.df, file = paste0("outputs/output_beta_biomass_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(biomass.output.df, file = paste0("outputs/output_beta_biomass_spatial", filepath.brightness,
+                                             filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export list of spectral distance across all years
-  save(biomass.output.list, file = paste0("outputs/output_beta_biomass_spatial", filepath.37, filepath.top.hits, ".RData"))
+  save(biomass.output.list, file = paste0("outputs/output_beta_biomass_spatial", filepath.brightness,
+                                          filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
   
   
 } # End of function
@@ -556,7 +581,7 @@ calc.beta.biomass.temporal <- function(composition.year.pairs, composition.plots
       
       # Filter the input dataframe to the correct year
       biomass.input <- biomass %>% 
-        filter(Year %in% c(year.start, year.end), Plot == i) %>% 
+        filter(Year %in% c(year.start, year.end), PLOT == i) %>% 
         dplyr::select(NPP)
       
       # Calculate distances
@@ -571,7 +596,7 @@ calc.beta.biomass.temporal <- function(composition.year.pairs, composition.plots
   
       # Add in supporting information
       biomass.distance.3 <- biomass.distance.2 %>% 
-        mutate(Plot = i,
+        mutate(PLOT = i,
                Years = j,
                Type = "Biomass",
                Method = "Euclidean") %>% 
@@ -591,7 +616,8 @@ calc.beta.biomass.temporal <- function(composition.year.pairs, composition.plots
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(biomass.output.df, file = paste0("outputs/output_beta_biomass_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(biomass.output.df, file = paste0("outputs/output_beta_biomass_temporal", filepath.brightness,
+                                             filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(biomass.output.df)
@@ -624,32 +650,32 @@ calc.beta.spectral.spatial <- function(composition.years){
     
     # Create an NIR key to know what dissimilarity values to put as NA (NIR < 0.2 likely shaded)
     spectra.key.NIR <- spectra.input.1 %>% 
-      dplyr::select(Plot, mean_NIR) %>% 
+      dplyr::select(PLOT, mean_NIR) %>% 
       mutate(mean_NIR = round(mean_NIR, digits = 5)) %>% # Strange error in plot 201
-      arrange(Plot) %>%
+      arrange(PLOT) %>%
       distinct() %>% 
       mutate(mean_NIR = ifelse(mean_NIR >= 0.2, "Not_Shaded", "Shaded"))
     
     # Create an NDVI key to know what dissimilarity values to put as NA (NDVI >= 0.2 retain)
     spectra.key.NDVI <- spectra.input.1 %>% 
-      dplyr::select(Plot, NDVI_broad) %>% 
+      dplyr::select(PLOT, NDVI_broad) %>% 
       mutate(NDVI_broad = round(NDVI_broad, digits = 5)) %>% # Strange error in plot 201
-      arrange(Plot) %>%
+      arrange(PLOT) %>%
       distinct() %>% 
       mutate(NDVI_broad = ifelse(NDVI_broad >= 0.2, "NDVI_keep", "NDVI_remove"))
     
     # Create an input dataframe for running the euclidean distance calculations
     spectra.input.2 <- spectra.input.1 %>% 
-      dplyr::select(Plot, Band, smooth_Reflectance) %>% 
+      dplyr::select(PLOT, Band, smooth_Reflectance) %>% 
       pivot_wider(names_from = "Band", values_from = "smooth_Reflectance")
     
     # Create a plot key for rejoining plot information below
     spectra.key.plot <- spectra.input.2 %>% 
-      dplyr::select(Plot) %>% 
+      dplyr::select(PLOT) %>% 
       mutate(ID = as.numeric(row.names(.)))
     
     # Remove plot column for calculations
-    spectra.input.3 <- dplyr::select(spectra.input.2, -Plot)
+    spectra.input.3 <- dplyr::select(spectra.input.2, -PLOT)
     
     # Create vector of wavelengths
     spectra.wavelengths <- sort(unique(spectra.input.1$Wavelength))
@@ -691,9 +717,9 @@ calc.beta.spectral.spatial <- function(composition.years){
     
     # Rename to actual plot numbers and prepare output for combination with other dataframes
     spectra.distance.5 <- left_join(spectra.distance.4, spectra.key.plot, by = c("minPlotID" = "ID")) %>% 
-      rename(PLOT_1 = Plot) %>% 
+      rename(PLOT_1 = PLOT) %>% 
       left_join(., spectra.key.plot, by = c("maxPlotID" = "ID")) %>%
-      rename(PLOT_2 = Plot) %>% 
+      rename(PLOT_2 = PLOT) %>% 
       dplyr::select(-c(minPlotID, maxPlotID)) %>% 
       pivot_longer(names_to = "Method", values_to = "Dissimilarity", cols = c("Euclidean", "Manhattan", "SAM")) %>% 
       mutate(Year = i,
@@ -702,21 +728,21 @@ calc.beta.spectral.spatial <- function(composition.years){
       arrange(Method, PLOT_1, PLOT_2)
     
     # Replace shaded NIR values (< 0.2) with NAs
-    spectra.distance.6 <- left_join(spectra.distance.5, spectra.key.NIR, by = c("PLOT_1" = "Plot")) %>% 
+    spectra.distance.6 <- left_join(spectra.distance.5, spectra.key.NIR, by = c("PLOT_1" = "PLOT")) %>% 
       rename(Shaded_1 = mean_NIR) %>% 
-      left_join(., spectra.key.NIR, by = c("PLOT_2" = "Plot")) %>% 
+      left_join(., spectra.key.NIR, by = c("PLOT_2" = "PLOT")) %>% 
       rename(Shaded_2 = mean_NIR) %>%
       mutate(Dissimilarity = ifelse(Shaded_1 == "Shaded" | Shaded_2 == "Shaded", NA, Dissimilarity)) %>% 
       dplyr::select(-c(Shaded_1, Shaded_2))
     
-    # Replace dissimilarity value with NA for plots with NDVI < 0.2
-    spectra.distance.7 <- left_join(spectra.distance.6, spectra.key.NDVI, by = c("PLOT_1" = "Plot")) %>% 
+    # If using NDVI threshold (NDVI >= 0.2), replace plots that don't meet it with NAs
+    spectra.distance.7 <- left_join(spectra.distance.6, spectra.key.NDVI, by = c("PLOT_1" = "PLOT")) %>% 
       rename(NDVI_1 = NDVI_broad) %>% 
-      left_join(., spectra.key.NDVI, by = c("PLOT_2" = "Plot")) %>% 
+      left_join(., spectra.key.NDVI, by = c("PLOT_2" = "PLOT")) %>% 
       rename(NDVI_2 = NDVI_broad) %>%
       mutate(Dissimilarity = ifelse(NDVI_1 == "NDVI_remove" | NDVI_2 == "NDVI_remove", NA, Dissimilarity)) %>% 
       dplyr::select(-c(NDVI_1, NDVI_2))
-    
+
     # Join dataframe output to overall output dataframe
     spectra.output.df <- rbind(spectra.output.df, spectra.distance.7)
     
@@ -781,15 +807,20 @@ calc.beta.spectral.spatial <- function(composition.years){
   spectra.panel <- grid.arrange(spectra.plot.e.m, spectra.plot.e.s, spectra.plot.m.s, ncol = 3)
   
   # Output plot to .png
-  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_spatial", filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
+  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_spatial_b", buffer, filepath.brightness,
+                                          filepath.smoothing, filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
   
   # Export dataframe of spectral distance across all years
-  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, filepath.brightness,
+                                             filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export lists of spectral distance across all years
-  save(spectra.output.list.euc, file = paste0("outputs/output_beta_spectral_spatial_euclidean", filepath.37, filepath.top.hits, ".RData"))
-  save(spectra.output.list.man, file = paste0("outputs/output_beta_spectral_spatial_manhattan", filepath.37, filepath.top.hits, ".RData"))
-  save(spectra.output.list.sam, file = paste0("outputs/output_beta_spectral_spatial_SAM", filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.euc, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_euclidean", filepath.brightness,
+                                              filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.man, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_manhattan", filepath.brightness,
+                                              filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.sam, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_SAM", filepath.brightness,
+                                              filepath.smoothing, filepath.37, filepath.top.hits, ".RData"))
   
   # Remove intermediate objects
   rm(spectra.output.df, spectra.output.list.euc, spectra.output.list.man, spectra.output.list.sam,
@@ -811,7 +842,7 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
   # Run loop for each pairwise year combination
   for (j in composition.year.pairs){
     
-    
+
     # Determine start and end year
     year.pair <- data.frame(j) %>% 
       separate(j, into = c("Start", "End"), sep = "_")
@@ -827,19 +858,19 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
       
       # Filter the input dataframe to the correct year
       spectra.input.1 <- spectra %>% 
-        filter(Year %in% c(year.start, year.end), Plot == i) %>% 
+        filter(Year %in% c(year.start, year.end), PLOT == i) %>% 
         mutate(Wavelength = round(Wavelength, digits = 1)) # Round to 1.d.p. as some off by 0.0001 in 2020
       
       
       # Create an NIR key to know what dissimilarity values to put as NA (NIR < 0.2 likely shaded)
       spectra.shaded <- spectra.input.1 %>% 
-        dplyr::select(Plot, mean_NIR) %>%
+        dplyr::select(PLOT, mean_NIR) %>%
         mutate(mean_NIR = round(mean_NIR, digits = 5)) %>% # Strange error in plot 201
-        arrange(Plot) %>% 
+        arrange(PLOT) %>% 
         distinct() %>% 
         mutate(mean_NIR = ifelse(mean_NIR >= 0.2, "Not_Shaded", "Shaded")) %>%
         mutate(ID = paste0("Year_", row.names(.))) %>% 
-        dplyr::select(-Plot) %>% 
+        dplyr::select(-PLOT) %>% 
         pivot_wider(names_from = "ID", values_from = "mean_NIR") %>% 
         mutate(shaded = ifelse(Year_1 == "Not_Shaded" & 
                                  Year_2 == "Not_Shaded", "Not Shaded", "Shaded")) %>% 
@@ -850,13 +881,13 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
       
       # Create an NDVI key to determine if have sufficient NDVI to retain
       spectra.ndvi <- spectra.input.1 %>% 
-        dplyr::select(Plot, NDVI_broad) %>% 
+        dplyr::select(PLOT, NDVI_broad) %>% 
         mutate(NDVI_broad = round(NDVI_broad, digits = 5)) %>% # Strange error in plot 201
-        arrange(Plot) %>%
+        arrange(PLOT) %>%
         distinct() %>% 
         mutate(NDVI_broad = ifelse(NDVI_broad >= 0.2, "NDVI_keep", "NDVI_remove")) %>% 
         mutate(ID = paste0("Year_", row.names(.))) %>% 
-        dplyr::select(-Plot) %>% 
+        dplyr::select(-PLOT) %>% 
         pivot_wider(names_from = "ID", values_from = "NDVI_broad") %>% 
         mutate(ndvi = ifelse(Year_1 == "NDVI_keep" & 
                                  Year_2 == "NDVI_keep", "NDVI_keep", "NDVI_remove")) %>% 
@@ -897,7 +928,7 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
         
         # Add in supporting information
         spectra.distance.3 <- spectra.distance.euc.2 %>% 
-          mutate(Plot = i,
+          mutate(PLOT = i,
                  Years = j,
                  Type = "Spectral",
                  Manhattan = spectra.distance.man.2[1,1],
@@ -938,18 +969,18 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
         
         
         # If the plot is shaded in 2017 and/or 2020
-        spectra.distance.shaded <- data.frame(Plot = i, Years = j, Type = "Spectral",
+        spectra.distance.shaded <- data.frame(PLOT = i, Years = j, Type = "Spectral",
                                               Method = "Euclidean", Dissimilarity = NA) %>% 
-          add_row(Plot = i, Years = j, Type = "Spectral",
+          add_row(PLOT = i, Years = j, Type = "Spectral",
                   Method = "Manhattan", Dissimilarity = NA) %>% 
-          add_row(Plot = i, Years = j, Type = "Spectral",
+          add_row(PLOT = i, Years = j, Type = "Spectral",
                   Method = "SAM", Dissimilarity = NA)
         
         # Append to main output
         spectra.output.df <- rbind(spectra.output.df, spectra.distance.shaded)
         
         # Remove intermediate objects
-        rm(spectra.distance.shaded)
+        # rm(spectra.distance.shaded)
         
         
       } # End of if statement re. shaded or not shaded
@@ -962,7 +993,8 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_temporal_b", buffer, filepath.brightness,
+                                             filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   
   # Generate wide format data for plotting
@@ -1010,7 +1042,8 @@ calc.beta.spectral.temporal <- function(composition.year.pairs, composition.plot
   spectra.panel <- grid.arrange(spectra.plot.e.m, spectra.plot.e.s, spectra.plot.m.s, ncol = 3)
   
   # Output plot to .png
-  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_temporal", filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
+  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_temporal_b", buffer, filepath.brightness,
+                                          filepath.smoothing, filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
   
   # Remove intermediate objects
   rm(spectra.output.df, spectra.output.df.w, spectra.plot.e.m, spectra.plot.e.s,
@@ -1045,32 +1078,32 @@ calc.beta.spectral.pca.spatial <- function(composition.years){
     
     # Create an NIR key to know what dissimilarity values to put as NA (NIR < 0.2 likely shaded)
     spectra.key.NIR <- spectra.input.1 %>% 
-      dplyr::select(Plot, mean_NIR) %>% 
+      dplyr::select(PLOT, mean_NIR) %>% 
       mutate(mean_NIR = round(mean_NIR, digits = 5)) %>% # Strange error in plot 201
-      arrange(Plot) %>%
+      arrange(PLOT) %>%
       distinct() %>% 
       mutate(mean_NIR = ifelse(mean_NIR >= 0.2, "Not_Shaded", "Shaded"))
     
     # Create an NDVI key to know what dissimilarity values to put as NA (NDVI >= 0.2 retain)
     spectra.key.NDVI <- spectra.input.1 %>% 
-      dplyr::select(Plot, NDVI_broad) %>% 
+      dplyr::select(PLOT, NDVI_broad) %>% 
       mutate(NDVI_broad = round(NDVI_broad, digits = 5)) %>% # Strange error in plot 201
-      arrange(Plot) %>%
+      arrange(PLOT) %>%
       distinct() %>% 
       mutate(NDVI_broad = ifelse(NDVI_broad >= 0.2, "NDVI_keep", "NDVI_remove"))
     
     # Create an input dataframe for running the euclidean distance calculations
     spectra.input.2 <- spectra.input.1 %>% 
-      dplyr::select(Plot, PC, PC_value) %>% 
+      dplyr::select(PLOT, PC, PC_value) %>% 
       pivot_wider(names_from = "PC", values_from = "PC_value")
     
     # Create a plot key for rejoining plot information below
     spectra.key.plot <- spectra.input.2 %>% 
-      dplyr::select(Plot) %>% 
+      dplyr::select(PLOT) %>% 
       mutate(ID = as.numeric(row.names(.)))
     
     # Remove plot column for calculations
-    spectra.input.3 <- dplyr::select(spectra.input.2, -Plot)
+    spectra.input.3 <- dplyr::select(spectra.input.2, -PLOT)
     
       # Create vector of wavelengths
     spectra.PCs <- sort(unique(spectra.input.1$PC))
@@ -1112,9 +1145,9 @@ calc.beta.spectral.pca.spatial <- function(composition.years){
     
     # Rename to actual plot numbers and prepare output for combination with other dataframes
     spectra.distance.5 <- left_join(spectra.distance.4, spectra.key.plot, by = c("minPlotID" = "ID")) %>% 
-      rename(PLOT_1 = Plot) %>% 
+      rename(PLOT_1 = PLOT) %>% 
       left_join(., spectra.key.plot, by = c("maxPlotID" = "ID")) %>%
-      rename(PLOT_2 = Plot) %>% 
+      rename(PLOT_2 = PLOT) %>% 
       dplyr::select(-c(minPlotID, maxPlotID)) %>% 
       pivot_longer(names_to = "Method", values_to = "Dissimilarity", cols = c("Euclidean", "Manhattan", "SAM")) %>% 
       mutate(Year = i,
@@ -1123,21 +1156,21 @@ calc.beta.spectral.pca.spatial <- function(composition.years){
       arrange(Method, PLOT_1, PLOT_2)
     
     # Replace shaded NIR values (< 0.2) with NAs
-    spectra.distance.6 <- left_join(spectra.distance.5, spectra.key.NIR, by = c("PLOT_1" = "Plot")) %>% 
+    spectra.distance.6 <- left_join(spectra.distance.5, spectra.key.NIR, by = c("PLOT_1" = "PLOT")) %>% 
       rename(Shaded_1 = mean_NIR) %>% 
-      left_join(., spectra.key.NIR, by = c("PLOT_2" = "Plot")) %>% 
+      left_join(., spectra.key.NIR, by = c("PLOT_2" = "PLOT")) %>% 
       rename(Shaded_2 = mean_NIR) %>%
       mutate(Dissimilarity = ifelse(Shaded_1 == "Shaded" | Shaded_2 == "Shaded", NA, Dissimilarity)) %>% 
       dplyr::select(-c(Shaded_1, Shaded_2))
     
-    # Replace dissimilarity value with NA for plots with NDVI < 0.2
-    spectra.distance.7 <- left_join(spectra.distance.6, spectra.key.NDVI, by = c("PLOT_1" = "Plot")) %>% 
+    # If using NDVI threshold (NDVI >= 0.2), replace plots that don't meet it with NAs
+    spectra.distance.7 <- left_join(spectra.distance.6, spectra.key.NDVI, by = c("PLOT_1" = "PLOT")) %>% 
       rename(NDVI_1 = NDVI_broad) %>% 
-      left_join(., spectra.key.NDVI, by = c("PLOT_2" = "Plot")) %>% 
+      left_join(., spectra.key.NDVI, by = c("PLOT_2" = "PLOT")) %>% 
       rename(NDVI_2 = NDVI_broad) %>%
       mutate(Dissimilarity = ifelse(NDVI_1 == "NDVI_remove" | NDVI_2 == "NDVI_remove", NA, Dissimilarity)) %>% 
       dplyr::select(-c(NDVI_1, NDVI_2))
-    
+
     # Join dataframe output to overall output dataframe
     spectra.output.df <- rbind(spectra.output.df, spectra.distance.7)
     
@@ -1217,15 +1250,20 @@ calc.beta.spectral.pca.spatial <- function(composition.years){
   spectra.panel <- grid.arrange(spectra.plot.e.m, spectra.plot.e.s, spectra.plot.m.s, ncol = 3)
   
   # Output plot to .png
-  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_PCA_comparison_spatial", filepath.37, filepath.top.hits, ".png"), width = 18, height = 5)
+  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_spatial_b", buffer, filepath.brightness,
+                                          filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".png"), width = 18, height = 5)
   
   # Export dataframe of spectral distance across all years
-  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_PCA_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, filepath.brightness,
+                                             filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export lists of spectral distance across all years
-  save(spectra.output.list.euc, file = paste0("outputs/output_beta_spectral_PCA_spatial_euclidean", filepath.37, filepath.top.hits, ".RData"))
-  save(spectra.output.list.man, file = paste0("outputs/output_beta_spectral_PCA_spatial_manhattan", filepath.37, filepath.top.hits, ".RData"))
-  save(spectra.output.list.sam, file = paste0("outputs/output_beta_spectral_PCA_spatial_SAM", filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.euc, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_euclidean", filepath.brightness,
+                                              filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.man, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_manhattan", filepath.brightness,
+                                              filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".RData"))
+  save(spectra.output.list.sam, file = paste0("outputs/output_beta_spectral_spatial_b", buffer, "_SAM", filepath.brightness,
+                                              filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".RData"))
   
   # Remove intermediate objects
   rm(spectra.output.df, spectra.output.list.euc, spectra.output.list.man, spectra.output.list.sam,
@@ -1263,19 +1301,19 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
       
       # Filter the input dataframe to the correct year
       spectra.input.1 <- spectra.PCA %>% 
-        filter(Year %in% c(year.start, year.end), Plot == i) %>% 
+        filter(Year %in% c(year.start, year.end), PLOT == i) %>% 
         mutate(PC = str_remove(PC, pattern = "PC"),
                PC = as.numeric(PC))
       
       # Create an NIR key to know what dissimilarity values to put as NA (NIR < 0.2 likely shaded)
       spectra.shaded <- spectra.input.1 %>% 
-        dplyr::select(Plot, mean_NIR) %>%
+        dplyr::select(PLOT, mean_NIR) %>%
         mutate(mean_NIR = round(mean_NIR, digits = 5)) %>% # Strange error in plot 201
-        arrange(Plot) %>% 
+        arrange(PLOT) %>% 
         distinct() %>% 
         mutate(mean_NIR = ifelse(mean_NIR >= 0.2, "Not_Shaded", "Shaded")) %>%
         mutate(ID = paste0("Year_", row.names(.))) %>% 
-        dplyr::select(-Plot) %>% 
+        dplyr::select(-PLOT) %>% 
         pivot_wider(names_from = "ID", values_from = "mean_NIR") %>% 
         mutate(shaded = ifelse(Year_1 == "Not_Shaded" & 
                                  Year_2 == "Not_Shaded", "Not Shaded", "Shaded")) %>% 
@@ -1286,13 +1324,13 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
       
       # Create an NDVI key to determine if have sufficient NDVI to retain
       spectra.ndvi <- spectra.input.1 %>% 
-        dplyr::select(Plot, NDVI_broad) %>% 
+        dplyr::select(PLOT, NDVI_broad) %>% 
         mutate(NDVI_broad = round(NDVI_broad, digits = 5)) %>% # Strange error in plot 201
-        arrange(Plot) %>%
+        arrange(PLOT) %>%
         distinct() %>% 
         mutate(NDVI_broad = ifelse(NDVI_broad >= 0.2, "NDVI_keep", "NDVI_remove")) %>% 
         mutate(ID = paste0("Year_", row.names(.))) %>% 
-        dplyr::select(-Plot) %>% 
+        dplyr::select(-PLOT) %>% 
         pivot_wider(names_from = "ID", values_from = "NDVI_broad") %>% 
         mutate(ndvi = ifelse(Year_1 == "NDVI_keep" & 
                                Year_2 == "NDVI_keep", "NDVI_keep", "NDVI_remove")) %>% 
@@ -1333,7 +1371,7 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
         
         # Add in supporting information
         spectra.distance.3 <- spectra.distance.euc.2 %>% 
-          mutate(Plot = i,
+          mutate(PLOT = i,
                  Years = j,
                  Type = "Spectral_PCA",
                  Manhattan = spectra.distance.man.2[1,1],
@@ -1374,11 +1412,11 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
         
         
         # If the plot is shaded in 2017 and/or 2020
-        spectra.distance.shaded <- data.frame(Plot = i, Years = j, Type = "Spectral_PCA",
+        spectra.distance.shaded <- data.frame(PLOT = i, Years = j, Type = "Spectral_PCA",
                                               Method = "Euclidean", Dissimilarity = NA) %>% 
-          add_row(Plot = i, Years = j, Type = "Spectral_PCA",
+          add_row(PLOT = i, Years = j, Type = "Spectral_PCA",
                   Method = "Manhattan", Dissimilarity = NA) %>% 
-          add_row(Plot = i, Years = j, Type = "Spectral_PCA",
+          add_row(PLOT = i, Years = j, Type = "Spectral_PCA",
                   Method = "SAM", Dissimilarity = NA)
         
         # Append to main output
@@ -1398,7 +1436,8 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_PCA_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+  write.csv(spectra.output.df, file = paste0("outputs/output_beta_spectral_temporal_b", buffer, filepath.brightness,
+                                             filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   
   # Generate wide format data for plotting
@@ -1446,7 +1485,8 @@ calc.beta.spectral.pca.temporal <- function(composition.year.pairs, composition.
   spectra.panel <- grid.arrange(spectra.plot.e.m, spectra.plot.e.s, spectra.plot.m.s, ncol = 3)
   
   # Output plot to .png
-  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_PCA_comparison_temporal", filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
+  ggsave(spectra.panel, filename = paste0("outputs/figures/beta_spectral_comparison_temporal_b", buffer, filepath.brightness,
+                                          filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".png"), width = 24, height = 6.5)
   
   # Remove intermediate objects
   rm(spectra.output.df, spectra.output.df.w, spectra.plot.e.m, spectra.plot.e.s,

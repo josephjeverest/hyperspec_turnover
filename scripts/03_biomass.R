@@ -1,6 +1,6 @@
 # 03 - Saddle Biomass Data
 # Joseph Everest
-# February 2023
+# February 2023, modified September 2023
 
 
 # LOAD PACKAGES ----
@@ -9,7 +9,7 @@
 library(tidyverse)
 
 
-# **[CHANGE]** - DECIDE WHETHER TO USE ALL HITS OR TOP HITS ONLY ----
+# **[CHANGE]** - DECIDE WHETHER TO USE TOP HITS ONLY OR NOT ----
 
 # Decision
 top.hits.only <- "No" # Default = "No"
@@ -21,7 +21,7 @@ if (top.hits.only == "No"){ filepath.top.hits <- "" } else { filepath.top.hits <
 # IMPORT DATA (biomass.1) ----
 
 # Load Niwot biomass data
-biomass.1 <- read.csv("data/nwt_biomass.csv")
+biomass.1 <- read.csv("data/saddgrid_npp.hh.data.csv")
 
 
 # DATA MANIPULATION (biomass.2) ----
@@ -32,7 +32,7 @@ biomass.2 <- biomass.1 %>%
   group_by(year, grid_pt) %>% 
   summarise(NPP = mean(NPP)) %>% # Average the two subsamples per year
   ungroup() %>% 
-  rename(Year = year, Plot = grid_pt) %>% 
+  rename(Year = year, PLOT = grid_pt) %>% 
   filter(Year %in% c(2017, 2018, 2019, 2020))
 
 
@@ -43,7 +43,7 @@ unique.plots <- unique(read.csv(paste0("outputs/output_saddle_cover", filepath.t
 
 # Remove plots not in those dataframes
 biomass.3 <- biomass.2 %>% 
-  filter(Plot %in% unique.plots)
+  filter(PLOT %in% unique.plots)
   
 
 # OUTPUT DATAFRAME ----

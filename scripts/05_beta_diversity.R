@@ -1,121 +1,121 @@
 # 05b - Calculating Beta Diversity - Taxonomic, Functional & Spectral
 # Joseph Everest
-# February 2023, adapted April 2023, May 2023
+# February 2023, modified April 2023, May 2023, September 2023
 
 
-# LOAD PACKAGES, THEMES & FUNCTIONS ----
+# LOAD PACKAGES & FUNCTIONS ----
 
 # Load packages
 library(tidyverse)
-library(viridis)
-library(gridExtra)
-library(reshape2)
-library(vegan)
-library(biotools)
 
-# Load themes and functions
-source("scripts/EX1_ggplot_themes.R")
+# Load functions
 source("scripts/05_beta_diversity_FUNCTION.R")
 
 
-# **[CHANGE]** - DECIDE WHETHER TO RETAIN PLOT 37 OR NOT ----
+# **[CHANGE]** - DECIDE ON PRE-PROCESSING DECISIONS ----
 
-# Decision
-retain.37 <- "Yes" # Default = "Yes"
-
-# Generate output folder path
-if (retain.37 == "Yes"){ filepath.37 <- "" } else { filepath.37 <- "_removed_37" }
-
-
-# **[CHANGE]** - DECIDE WHETHER TO RETAIN PLOT 37 OR NOT ----
-
-# Decision
+# ** [1] - Decisions
+brightness <- "Yes" # Default = "No"
+smoothing <- "No" # Default = "No"
+PCA <- "No" # Default = "No"
+remove.37 <- "No" # Default = "No"
 top.hits.only <- "No" # Default = "No"
+buffer <- "1" # Default = "1"
 
-# Generate output folder path
+# Generate output folder paths
+if (brightness == "No"){ filepath.brightness <- "" } else { filepath.brightness <- "_brightness_normalized" }
+if (smoothing == "No"){ filepath.smoothing <- "" } else {filepath.smoothing <- "_smoothed"}
+if (remove.37 == "No"){ filepath.37 <- "" } else { filepath.37 <- "_removed_37" }
 if (top.hits.only == "No"){ filepath.top.hits <- "" } else { filepath.top.hits <- "_top_hits_only" }
 
 
-# **[CHANGE]** - GENERATE INPUT PARAMETERS ---
+# **[CHANGE]** - DECIDE WHAT ANALYSES TO RUN ----
 
-# ** [1] - combined composition and trait data
+# ** [2] - Decide which spatial analyses to run
+run.spatial.taxonomic <- TRUE
+run.spatial.functional <- TRUE
+run.spatial.biomass <- TRUE
+run.spatial.spectral <- TRUE
+
+# ** [3] - Decide which temporal analyses to run
+run.temporal.taxonomic <- TRUE
+run.temporal.functional <- TRUE
+run.temporal.biomass <- TRUE
+run.temporal.spectral <- TRUE
+
+
+# GENERATE INPUT PARAMETERS ---
+
+# Combined composition and trait data
 composition.traits <- read.csv(paste0("outputs/output_saddle_composition_traits", filepath.top.hits, ".csv")) %>% 
-  mutate(REMOVE.37 = ifelse(retain.37 == "No" & PLOT == 37, TRUE, FALSE)) %>% 
+  mutate(REMOVE.37 = ifelse(remove.37 == "Yes" & PLOT == 37, TRUE, FALSE)) %>% 
   filter(REMOVE.37 != TRUE) %>% 
   dplyr::select(-REMOVE.37)
 
-# ** [2] - Spectral output data
-spectra <- read.csv(paste0("outputs/output_saddle_spectra_b1", filepath.top.hits, ".csv")) %>% 
-  mutate(REMOVE.37 = ifelse(retain.37 == "No" & Plot == 37, TRUE, FALSE)) %>% 
-  filter(REMOVE.37 != TRUE) %>% 
-  dplyr::select(-REMOVE.37)
-
-# ** [3] - Spectral output data
-spectra.PCA <- read.csv(paste0("outputs/output_saddle_spectra_b1_PCA", filepath.top.hits, ".csv")) %>% 
-  mutate(REMOVE.37 = ifelse(retain.37 == "No" & Plot == 37, TRUE, FALSE)) %>% 
-  filter(REMOVE.37 != TRUE) %>% 
-  dplyr::select(-REMOVE.37)
-
-# ** [4] - biomass output data
+# Biomass output data
 biomass <- read.csv(paste0("outputs/output_biomass", filepath.top.hits, ".csv")) %>% 
-  mutate(REMOVE.37 = ifelse(retain.37 == "No" & Plot == 37, TRUE, FALSE)) %>% 
+  mutate(REMOVE.37 = ifelse(remove.37 == "Yes" & PLOT == 37, TRUE, FALSE)) %>% 
+  filter(REMOVE.37 != TRUE) %>% 
+  dplyr::select(-REMOVE.37)
+  
+# Spectral output data
+spectra <- read.csv(paste0("outputs/output_saddle_spectra_b", buffer, filepath.brightness,
+                           filepath.smoothing, filepath.top.hits, ".csv")) %>% 
+  mutate(REMOVE.37 = ifelse(remove.37 == "Yes" & PLOT == 37, TRUE, FALSE)) %>% 
   filter(REMOVE.37 != TRUE) %>% 
   dplyr::select(-REMOVE.37)
 
-# ** [5] - Create vector of the years in the dataset
+# Spectral PCA output data
+spectra.PCA <- read.csv(paste0("outputs/output_saddle_spectra_b", buffer, filepath.brightness,
+                               filepath.smoothing, "_PCA", filepath.top.hits, ".csv")) %>% 
+  mutate(REMOVE.37 = ifelse(remove.37 == "Yes" & PLOT == 37, TRUE, FALSE)) %>% 
+  filter(REMOVE.37 != TRUE) %>% 
+  dplyr::select(-REMOVE.37)
+
+# Create vector of the years in the dataset
 composition.years <- c(2017, 2018, 2019, 2020)
 
-# ** [6] - Create vector of the paired years in the dataset
+# Create vector of the paired years in the dataset
 composition.year.pairs <- c("2017_2018", "2017_2019", "2017_2020", "2018_2019", "2018_2020", "2019_2020")
 
-# ** [7] - Create vector of plots in the dataset
+# Create vector of plots in the dataset
 composition.plots <- sort(unique(composition.traits$PLOT))
 
 
-# CALCULATE BRAY-CURTIS DISSIMILARITY MATRIX - SPATIAL (beta.taxonomic.spatial) ----
+# CALCULATE SPATIAL DISSIMILARITY MATRICES ----
 
 # Run Bray-Curtis calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.taxonomic.spatial(composition.years)
+if (run.spatial.taxonomic == TRUE){calc.beta.taxonomic.spatial(composition.years)}
 
-# Import output as dataframe
-beta.taxonomic.spatial <- read.csv(paste0("outputs/output_beta_taxonomic_spatial", filepath.37, filepath.top.hits, ".csv"))
-
-
-# CALCULATE FUNCTIONAL DISSIMILARITY MATRIX - SPATIAL (beta.functional.spatial) ----
+# Load in results
+beta.taxonomic.spatial <- read.csv(paste0("outputs/output_beta_taxonomic_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
 # Run dissimilarity calculations for each year of dataset (~ 2-3 minutes)
-# calc.beta.functional.spatial(composition.years)
+if (run.spatial.functional == TRUE){calc.beta.functional.spatial(composition.years)}
 
-# Import output as dataframe
-beta.functional.spatial <- read.csv(paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".csv"))
-
-
-# CALCULATE BIOMASS DISSIMILARITY MATRIX - SPATIAL (beta.biomass.spatial) ----
+# Load in results
+beta.functional.spatial <- read.csv(paste0("outputs/output_beta_functional_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
 # Run biomass distance calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.biomass.spatial(composition.years)
+if (run.spatial.biomass == TRUE){calc.beta.biomass.spatial(composition.years)}
 
-# Import output as dataframe
-beta.biomass.spatial <- read.csv(paste0("outputs/output_beta_biomass_spatial", filepath.37, filepath.top.hits, ".csv"))
-
-
-# CALCULATE SPECTRAL DISSIMILARITY MATRIX - SPATIAL (beta.spectral.spatial) ----
+# Load in results
+beta.biomass.spatial <- read.csv(paste0("outputs/output_beta_biomass_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
 # Run spectral dissimilarity calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.spectral.spatial(composition.years)
+if (run.spatial.spectral == TRUE){calc.beta.spectral.spatial(composition.years)}
 
-# Import output as dataframe
-beta.spectral.spatial <- read.csv(paste0("outputs/output_beta_spectral_spatial", filepath.37, filepath.top.hits, ".csv"))
+# Load in results
+beta.spectral.spatial <- read.csv(paste0("outputs/output_beta_spectral_spatial_b", buffer, filepath.brightness,
+                                         filepath.smoothing, filepath.37, filepath.top.hits, ".csv"))
 
+# Run spectral (PCA) dissimilarity calculations for each year of dataset (~ 2-3 seconds)
+if (run.spatial.spectral == TRUE){calc.beta.spectral.pca.spatial(composition.years)}
 
-# CALCULATE SPECTRAL DISSIMILARITY MATRIX BY PCA - SPATIAL (beta.spectral.pca.spatial) ----
-
-# Run spectral dissimilarity calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.spectral.pca.spatial(composition.years)
-
-# Import output as dataframe
-beta.spectral.pca.spatial <- read.csv(paste0("outputs/output_beta_spectral_PCA_spatial", filepath.37, filepath.top.hits, ".csv"))
-
+# Load in results
+beta.spectral.pca.spatial <- read.csv(paste0("outputs/output_beta_spectral_spatial_b", buffer, filepath.brightness,
+                                             filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".csv"))
+  
 
 #  COMBINE DISSIMILARITY OUTPUTS - SPATIAL (beta.full.spatial) ----
 
@@ -129,67 +129,60 @@ beta.full.spatial <- rbind(beta.taxonomic.spatial, beta.functional.spatial,
   pivot_wider(names_from = "Type", values_from = "Dissimilarity")
 
 # Export full wide dataframe
-write.csv(beta.full.spatial, file = paste0("outputs/output_beta_FULL_spatial", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+write.csv(beta.full.spatial, file = paste0("outputs/output_beta_FULL_spatial_b", buffer, filepath.brightness,
+                                           filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
 
 
-# CALCULATE BRAY-CURTIS DISSIMILARITY MATRIX - TEMPORAL (beta.taxonomic.temporal) ----
+# CALCULATE TEMPORAL DISSIMILARITY MATRICES ----
 
-# Run Bray-Curtis calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.taxonomic.temporal(composition.year.pairs, composition.plots)
+# Run Bray-Curtis calculations for each plot in dataset (~ 2-3 seconds)
+if (run.temporal.taxonomic == TRUE){calc.beta.taxonomic.temporal(composition.year.pairs, composition.plots)}
 
-# Import output as dataframe
-beta.taxonomic.temporal <- read.csv(paste0("outputs/output_beta_taxonomic_temporal", filepath.37, filepath.top.hits, ".csv"))
+# Load in results
+beta.taxonomic.temporal <- read.csv(paste0("outputs/output_beta_taxonomic_temporal", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
+# Run dissimilarity calculations for each plot in dataset (~ 2-3 minutes)
+if (run.temporal.functional == TRUE){calc.beta.functional.temporal(composition.year.pairs, composition.plots)}
 
-# CALCULATE FUNCTIONAL DISSIMILARITY MATRIX - TEMPORAL (beta.functional.temporal) ----
+# Load in results
+beta.functional.temporal <- read.csv(paste0("outputs/output_beta_functional_temporal", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
-# Run distance calculations for each year of dataset (~ 2-3 minutes)
-# calc.beta.functional.temporal(composition.year.pairs, composition.plots)
+# Run biomass distance calculations for each plot in dataset (~ 2-3 seconds)
+if (run.temporal.biomass == TRUE){calc.beta.biomass.temporal(composition.year.pairs, composition.plots)}
 
-# Import output as dataframe
-beta.functional.temporal <- read.csv(paste0("outputs/output_beta_functional_temporal", filepath.37, filepath.top.hits, ".csv"))
+# Load in results
+beta.biomass.temporal <- read.csv(paste0("outputs/output_beta_biomass_temporal", filepath.brightness, filepath.37, filepath.top.hits, ".csv"))
 
-
-# CALCULATE BIOMASS DISSIMILARITY MATRIX - TEMPORAL (beta.biomass.temporal) ----
-
-# Run distance calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.biomass.temporal(composition.year.pairs, composition.plots)
-
-# Import output as dataframe
-beta.biomass.temporal <- read.csv(paste0("outputs/output_beta_biomass_temporal", filepath.37, filepath.top.hits, ".csv"))
-
-
-# CALCULATE SPECTRAL DISSIMILARITY MATRIX - TEMPORAL (beta.spectral.temporal) ----
-
-# Run distance calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.spectral.temporal(composition.year.pairs, composition.plots)
-
-# Import output as dataframe
-beta.spectral.temporal <- read.csv(paste0("outputs/output_beta_spectral_temporal", filepath.37, filepath.top.hits, ".csv"))
+# Run spectral dissimilarity calculations for each plot in dataset (~ 2-3 seconds)
+if (run.temporal.spectral == TRUE){calc.beta.spectral.temporal(composition.year.pairs, composition.plots)}
+  
+# Load in results
+beta.spectral.temporal <- read.csv(paste0("outputs/output_beta_spectral_temporal_b", buffer, filepath.brightness,
+                                          filepath.smoothing, filepath.37, filepath.top.hits, ".csv"))
 
 
-# CALCULATE SPECTRAL DISSIMILARITY MATRIX BY PCA - TEMPORAL (beta.spectral.pca.temporal) ----
-
-# Run spectral dissimilarity calculations for each year of dataset (~ 2-3 seconds)
-# calc.beta.spectral.pca.temporal(composition.year.pairs, composition.plots)
-
-# Import output as dataframe
-beta.spectral.pca.temporal <- read.csv(paste0("outputs/output_beta_spectral_PCA_temporal", filepath.37, filepath.top.hits, ".csv"))
+# Run spectral (PCA) dissimilarity calculations for each plot in dataset (~ 2-3 seconds)
+if (run.temporal.spectral == TRUE){calc.beta.spectral.pca.temporal(composition.year.pairs, composition.plots)}
+  
+# Load in results
+beta.spectral.pca.temporal <- read.csv(paste0("outputs/output_beta_spectral_temporal_b", buffer, filepath.brightness,
+                                              filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".csv"))
 
 
 #  COMBINE DISSIMILARITY OUTPUTS - TEMPORAL (beta.full.temporal) ----
 
 # Bind the datasets together and convert to wide format
 beta.full.temporal <- rbind(beta.taxonomic.temporal, beta.functional.temporal,
-                           beta.biomass.temporal, beta.spectral.temporal,
-                           beta.spectral.pca.temporal) %>% 
+                            beta.biomass.temporal, beta.spectral.temporal,
+                            beta.spectral.pca.temporal) %>% 
   mutate(Type = ifelse(str_detect(Type, pattern = "Spectral"), paste0(Type, "_", Method), Type),
          Type = paste0(Type, "_Dis")) %>% 
   dplyr::select(-Method) %>% 
   pivot_wider(names_from = "Type", values_from = "Dissimilarity")
 
 # Export full wide dataframe
-write.csv(beta.full.temporal, file = paste0("outputs/output_beta_FULL_temporal", filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
+write.csv(beta.full.temporal, file = paste0("outputs/output_beta_FULL_temporal_b", buffer, filepath.brightness,
+                                            filepath.smoothing, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
 
 
 # PLOT SPECTRAL VS SPECTRAL PCA DISTANCES AGAINST ONE ANOTHER ----
@@ -241,14 +234,14 @@ write.csv(beta.full.temporal, file = paste0("outputs/output_beta_FULL_temporal",
 spectral.comparison.panel <- grid.arrange(spectral.comparison.spatial, spectral.comparison.temporal, ncol = 2)
 
 # Export plot
-ggsave(spectral.comparison.panel, filename = paste0("outputs/figures/beta_spectral_vs_PCA_comparison", filepath.37, filepath.top.hits, ".png"),
-       width = 16, height = 7.5)
+ggsave(spectral.comparison.panel, filename = paste0("outputs/figures/beta_spectral_vs_PCA_comparison_b", buffer, filepath.brightness,
+                                                    filepath.smoothing, filepath.37, filepath.top.hits, ".png"), width = 16, height = 7.5)
 
 
 # FURTHER EXPLORATION ----
 
 # Import dataframe of plot vegetation classes
-veg.class <- read.csv("data/nwt_biomass.csv") %>% 
+veg.class <- read.csv("hyperspectral/data/saddgrid_npp.hh.data.csv") %>% 
   dplyr::select(grid_pt, veg_class) %>% 
   distinct()
 
@@ -271,19 +264,20 @@ beta.explore.37 <- beta.explore.w %>%
 # EXPORT EXAMPLE MATRIX - SPATIAL ----
 
 # Load in the matrices
-matrices.functional.spatial <- get(load(paste0("outputs/output_beta_functional_spatial.RData")))
+matrices.functional.spatial <- get(load(paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".RData")))
 
 # Trimmed matrices
 matrix.spatial <- as.data.frame(as.matrix(matrices.functional.spatial[[1]]))[1:10, 1:10]
 
 # Write matrix to .csv
-write.csv(matrix.spatial, file = paste0("outputs/output_example_matrix_spatial.csv"))
+write.csv(matrix.spatial, file = paste0("outputs/output_example_matrix_spatial", filepath.37, filepath.top.hits, ".csv"))
 
 
 # EXPORT EXAMPLE MATRIX - TEMPORAL ----
 
 # Load in temporal beta outputs
-beta.temporal <- read.csv(paste0("outputs/output_beta_FULL_temporal.csv"))
+beta.temporal <- read.csv(paste0("outputs/output_beta_FULL_temporal_b", buffer, filepath.brightness,
+                                 filepath.smoothing, filepath.37, filepath.top.hits, ".csv"))
 
 # Cut to correct years
 beta.temporal.years <- beta.temporal %>% 
@@ -291,7 +285,7 @@ beta.temporal.years <- beta.temporal %>%
 
 # Cut to single plot (2)
 beta.temporal.cut <- beta.temporal.years %>% 
-  filter(Plot == 2)
+  filter(PLOT == 2)
 
 # Cut dataframe to required information for single matrix
 beta.temporal.df.f <- dplyr::select(beta.temporal.cut, Year_1, Year_2, Functional_Dis)
@@ -308,4 +302,6 @@ beta.temporal.matrix.f <- with(beta.temporal.df.f,
 matrix.temporal <- as.data.frame(as.matrix(beta.temporal.matrix.f))
 
 # Write matrix to .csv
-write.csv(matrix.temporal, file = paste0("outputs/output_example_matrix_temporal.csv"))
+write.csv(matrix.temporal, file = paste0("outputs/output_example_matrix_temporal", filepath.brightness,
+                                         filepath.smoothing, filepath.37, filepath.top.hits, ".csv"))
+

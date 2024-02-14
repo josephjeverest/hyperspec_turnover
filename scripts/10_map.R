@@ -1,5 +1,5 @@
 # 10 - Map of Niwot with Veg. Classes
-# Sarah Elmendorf, with Joseph Everest
+# Joseph Everest
 # June 2023
 
 
@@ -8,9 +8,16 @@
 # Load packages
 library(tidyverse)
 library(raster)
+library(neonUtilities)
 library(sf)
 library(basemaps)
 library(cowplot)
+
+
+# **[CHANGE]** - WHETHER OR NOT TO DOWNLOAD NEON RGB IMAGERY? ----
+
+# Decide whether to download
+download.NEON.tiles <- FALSE # Default = FALSE
 
 
 # **[CHANGE]** - DECIDE WHETHER TO RETAIN PLOT 37 OR NOT ----
@@ -19,7 +26,11 @@ library(cowplot)
 retain.37 <- "Yes" # Default = "Yes"
 
 # Generate output folder path
-if (retain.37 == "Yes") {filepath.37 <- ""} else {filepath.37 <- "_removed_37"}
+if (retain.37 == "Yes") {
+  filepath.37 <- ""
+} else {
+  filepath.37 <- "_removed_37"
+}
 
 
 # **[CHANGE]** - DECIDE WHETHER TO RETAIN PLOT 37 OR NOT ----
@@ -28,16 +39,61 @@ if (retain.37 == "Yes") {filepath.37 <- ""} else {filepath.37 <- "_removed_37"}
 top.hits.only <- "No" # Default = "No"
 
 # Generate output folder path
-if (top.hits.only == "No") {filepath.top.hits <- ""} else {filepath.top.hits <- "_top_hits_only"}
+if (top.hits.only == "No") {
+  filepath.top.hits <- ""
+} else {
+  filepath.top.hits <- "_top_hits_only"
+}
 
 
-# IMPORT LOCATIONS AND VEG. CLASS INFORMATION ----
+# DOWNLOAD RGB DATA ----
 
 # Import saddle locations
 saddle.locations <- read.csv(paste0("outputs/output_saddle_locations", filepath.37, filepath.top.hits, ".csv"))
 
+# Define Eastings and Northings
+saddle.eastings <- c(unique(saddle.locations$EASTING))
+saddle.northings <- c(unique(saddle.locations$NORTHING))
+
+
+if (download.NEON.tiles == TRUE) {
+  # Create directory to move files to
+  dir.create("data/NEON/tiles")
+
+  # Run download function
+  byTileAOP("DP3.30010.001",
+    site = "NIWO",
+    year = "2020", # Data available from 2017 to 2020
+    easting = saddle.eastings,
+    northing = saddle.northings,
+    buffer = 1,
+    check.size = TRUE,
+    savepath = "data/NEON/",
+    token = NA_character_
+  )
+
+
+  # Run loop to rename (move) files to easier location with year in filename
+  for (tile.extent in c("4433", "4434")) {
+    file.copy(
+      paste0(
+        "data/NEON/DP3.30010.001/neon-aop-products/2020/",
+        "FullSite/D13/2020_NIWO_4/L3/Camera/Mosaic/2020_NIWO_4_449000_",
+        tile.extent, "000_image.tif"
+      ),
+      paste0(
+        "data/NEON/tiles/2020_NIWO_4_449000_", tile.extent,
+        "000_image.tif"
+      )
+    )
+  } # End of extent loop
+} # End of if statement
+
+
+# IMPORT VEG. CLASS INFORMATION ----
+
 # Load in saddle NPP dataset which has veg class per plot
-veg.class.1 <- read.csv("data/nwt_biomass.csv")
+veg.class.1 <- read.csv("data/saddgrid_npp.hh.data.csv")
 
 # Trim down the NPP dataset to useful veg type data
 veg.class.2 <- veg.class.1 %>%
@@ -108,7 +164,7 @@ saddle.locations.class <- SpatialPointsDataFrame(
 )
 
 # PRODUCE MAP OF SADDLE PLOTS ----
-tiff("outputs/figures/manuscript/map.tiff",
+tiff(paste0("outputs/figures/manuscript/map.tiff"),
   width = 5, height = 6, units = "in", res = 300
 )
 
@@ -173,7 +229,7 @@ my_points.sf <- sf::st_transform(my_points.sf, crs(get_the_crs))
 my_points.denver <- sf::st_transform(my_points.denver, crs(get_the_crs))
 
 
-mymap <- basemap_ggplot(co_extent) +
+mymap <- basemap_ggplot(proj_co_extent) +
   geom_sf_text(
     data = my_points.denver, label = "Denver",
     nudge_x = 90000,
@@ -194,17 +250,17 @@ mymap <- basemap_ggplot(co_extent) +
 
 
 ggsave(mymap,
-  file = "outputs/figures/manuscript/regional_map.tiff",
+  file = paste0("outputs/figures/manuscript/regional_map.tiff"),
   width = 5, height = 4.25, units = "in", dpi = 600,
 )
 
 
 # COMBINE INTO ONE MAP W INSET ----
 p1 <- ggdraw() +
-  draw_image(
+  draw_image(paste0(
     "outputs/figures/manuscript/regional_map.tiff"
-  , scale = 0.9)
-p2 <- ggdraw() + cowplot::draw_image("outputs/figures/manuscript/map.tiff", scale = 0.9)
+  ), scale = 0.9)
+p2 <- ggdraw() + cowplot::draw_image(paste0("outputs/figures/manuscript/map.tiff"), scale = 0.9)
 
 
 plot.with.inset <-
@@ -215,7 +271,7 @@ plot.with.inset <-
     hjust = 0, vjust = 0
   )
 
-tiff("outputs/figures/manuscript/inset_map.tiff",
+tiff(paste0("outputs/figures/manuscript/inset_map.tiff"),
   width = 5, height = 4.25, units = "in", res = 600
 )
 

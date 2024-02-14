@@ -1,21 +1,21 @@
 # 08 - Functions to extract NDVI and compare to biomass
 # Joseph Everest
-# March 2023
+# March 2023, modified April 2023, May 2023, September 2023
 
 
 # FUNCTION: EXTRACT NDVI FROM ALREADY EXTRACTED HYPERSPECTRA ----
 
-extract.ndvi.buffer <- function(spectra){
+extract.ndvi <- function(spectra){
   
   # Generate broad-band NDVI using Sentinel-2 bands
   spectra.ndvi <- spectra %>% 
-    dplyr::select(Plot, Year, Wavelength, scale_Reflectance) %>% 
+    dplyr::select(PLOT, Year, Wavelength, scale_Reflectance) %>% 
     mutate(Sentinel_Band = NA, # Label wavelengths in Sentinel-2 bands
            Sentinel_Band = ifelse(Wavelength > 633 & Wavelength < 695, "Band_4", Sentinel_Band),
            Sentinel_Band = ifelse(Wavelength > 726 & Wavelength < 938, "Band_8", Sentinel_Band)) %>% 
     filter(Sentinel_Band %in% c("Band_4", "Band_8")) %>% # Retain only Sentintel-2 bands
     dplyr::select(-Wavelength) %>% 
-    group_by(Plot, Year, Sentinel_Band) %>% 
+    group_by(PLOT, Year, Sentinel_Band) %>% 
     summarise(mean_Reflectance = mean(scale_Reflectance)) %>% # Calculte mean reflectance for each Sentinel-2 band
     ungroup() %>% 
     pivot_wider(names_from = "Sentinel_Band", values_from = "mean_Reflectance") %>% 
@@ -23,11 +23,10 @@ extract.ndvi.buffer <- function(spectra){
            exp_NDVI = exp(NDVI)) # Add an exponentiated NDVI column
   
   # Write output to csv
-  write.csv(spectra.ndvi, file = "outputs/output_saddle_ndvi.csv", row.names = FALSE)
+  write.csv(spectra.ndvi, file = paste0("outputs/output_saddle_ndvi_b", buffer, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(spectra.ndvi)
-  
   
 }
 
@@ -53,15 +52,28 @@ calc.beta.ndvi.spatial <- function(composition.years){
     
     # Create a key of the plots to row numbers
     ndvi.key <- ndvi.cut %>%
-      dplyr::select(Plot) %>% 
+      dplyr::select(PLOT) %>% 
       mutate(ID = as.numeric(row.names(.)))    
     
-    # Create input dataframe for Euclidean distance calculations
-    ndvi.input <- ndvi.cut %>% 
-      dplyr::select(exp_NDVI)
+    # Create input dataframe for Euclidean distance calculations.
+    if (exponentiate == "No"){ 
+      
+      # Select standard NDVI
+      ndvi.input <- dplyr::select(ndvi.cut, NDVI)
+      
+    } else {
+      
+      # Select exponentiated NDVI
+      ndvi.input <- dplyr::select(ndvi.cut, exp_NDVI) %>% 
+        rename(NDVI = exp_NDVI)
+      
+    } # End of if statement regarding exponentiated NDVI
+    
+    # Generate vector of spectral input metric
+    spectral.input.metric <- tolower(spectral.metric)
     
     # Calculate distances
-    ndvi.distance.1 <- dist(ndvi.input, method = "euclidean", diag = FALSE, upper = FALSE)
+    ndvi.distance.1 <- dist(ndvi.input, method = paste0(spectral.input.metric), diag = FALSE, upper = FALSE)
     
     # Append matrix to list for outputting
     ndvi.output.list[[paste0(i)]] <- ndvi.distance.1 
@@ -84,9 +96,9 @@ calc.beta.ndvi.spatial <- function(composition.years){
     
     # Rename to actual plot numbers and prepare output for combination with other dataframes
     ndvi.distance.4 <- left_join(ndvi.distance.3, ndvi.key, by = c("minPlotID" = "ID")) %>% 
-      rename(PLOT_1 = Plot) %>% 
+      rename(PLOT_1 = PLOT) %>% 
       left_join(., ndvi.key, by = c("maxPlotID" = "ID")) %>%
-      rename(PLOT_2 = Plot) %>% 
+      rename(PLOT_2 = PLOT) %>% 
       dplyr::select(-c(minPlotID, maxPlotID)) %>% 
       mutate(Year = i,
              Type = "NDVI",
@@ -102,10 +114,12 @@ calc.beta.ndvi.spatial <- function(composition.years){
   
   
   # Export dataframe of spectral distance across all years
-  write.csv(ndvi.output.df, file = "outputs/output_beta_ndvi_spatial.csv", row.names = FALSE)
+  write.csv(ndvi.output.df, file = paste0("outputs/output_beta_ndvi_spatial_b", buffer, "_", spectral.metric, filepath.exponentiate, 
+                                          filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Export list of spectral distance across all years
-  save(ndvi.output.list, file = "outputs/output_beta_ndvi_spatial.RData")
+  save(ndvi.output.list, file = paste0("outputs/output_beta_ndvi_spatial_b", buffer, "_", spectral.metric, filepath.exponentiate, 
+                                       filepath.top.hits, ".RData"))
   
   
 } # End of function
@@ -137,13 +151,29 @@ calc.beta.ndvi.temporal <- function(composition.year.pairs, composition.plots){
     for (i in composition.plots){
       
       
-      # Filter the input dataframe to the correct year
-      ndvi.input <- saddle.ndvi %>% 
-        filter(Year %in% c(year.start, year.end), Plot == i) %>% 
-        dplyr::select(exp_NDVI)
+      # Filter the input dataframe to correct year and whether NDVI exponentiated
+      if (exponentiate == "No"){
+        
+        # Filter the input dataframe to the correct year and select standard NDVI
+        ndvi.input <- saddle.ndvi %>% 
+          filter(Year %in% c(year.start, year.end), PLOT == i) %>% 
+          dplyr::select(NDVI)
+        
+      } else {
+        
+        # Filter the input dataframe to the correct year and select exponentiated NDVI
+        ndvi.input <- saddle.ndvi %>% 
+          filter(Year %in% c(year.start, year.end), PLOT == i) %>% 
+          dplyr::select(exp_NDVI) %>% 
+          rename(NDVI = exp_NDVI)
+        
+      }
+
+      # Generate vector of spectral input metric
+      spectral.input.metric <- tolower(spectral.metric)
       
       # Calculate distances
-      ndvi.distance.1 <- dist(ndvi.input, method = "euclidean", diag = FALSE, upper = FALSE)
+      ndvi.distance.1 <- dist(ndvi.input, method = paste0(spectral.input.metric), diag = FALSE, upper = FALSE)
       
       # Turn into dataframe and select required cell
       ndvi.distance.2 <- melt(as.matrix(ndvi.distance.1), varnames = c("row", "col")) %>% 
@@ -154,7 +184,7 @@ calc.beta.ndvi.temporal <- function(composition.year.pairs, composition.plots){
       
       # Add in supporting information
       ndvi.distance.3 <- ndvi.distance.2 %>% 
-        mutate(Plot = i,
+        mutate(PLOT = i,
                Years = j,
                Type = "NDVI",
                Method = "Euclidean") %>% 
@@ -174,136 +204,11 @@ calc.beta.ndvi.temporal <- function(composition.year.pairs, composition.plots){
   
   
   # Export dataframe of Bray-Curtis dissimilarity across all years
-  write.csv(ndvi.output.df, file = "outputs/output_beta_ndvi_temporal.csv", row.names = FALSE)
+  write.csv(ndvi.output.df, file = paste0("outputs/output_beta_ndvi_temporal_b", buffer, "_", spectral.metric, filepath.exponentiate, 
+                                          filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(ndvi.output.df)
-  
-  
-} # End of function
-
-
-# FUNCTION: SPATIAL VISUALISATIONS ----
-
-beta.visualisations.spatial.ndvi <- function(beta.spatial.full){
-
-  
-  # Create string for plot subtitle
-  plots.included <- "PLOTS: NDVI Threshold (O.2)"
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.spatial.n.t <- ggplot(data = beta.spatial.full, aes(x = NDVI_Dis, y = Taxonomic_Dis, fill = as.factor(Year))) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "magma", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.spatial.full$NDVI_Dis), max(beta.spatial.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.spatial.full$Taxonomic_Dis), max(beta.spatial.full$Taxonomic_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Taxonomic Dissimilarity [SPATIAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Taxonomic (Bray-Curtis) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.spatial.n.f <- ggplot(data = beta.spatial.full, aes(x = NDVI_Dis, y = Functional_Dis, fill = as.factor(Year))) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "viridis", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.spatial.full$NDVI_Dis), max(beta.spatial.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.spatial.full$Functional_Dis), max(beta.spatial.full$Functional_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Functional Dissimilarity [SPATIAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Functional (FDis) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.spatial.n.b <- ggplot(data = beta.spatial.full, aes(x = NDVI_Dis, y = Biomass_Dis, fill = as.factor(Year))) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "mako", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.spatial.full$NDVI_Dis), max(beta.spatial.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.spatial.full$Biomass_Dis), max(beta.spatial.full$Biomass_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Biomass Dissimilarity [SPATIAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Biomass (Euclidean) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Generate a panel of the outputs
-  panel.spatial <- grid.arrange(plot.beta.spatial.n.t, plot.beta.spatial.n.f, plot.beta.spatial.n.b, ncol = 3)
-  
-  # Export plot
-  ggsave(panel.spatial, file = "outputs/figures/beta_spatial_ndvi.png", width = 21, height = 5)
-  
-  
-} # End of function
-
-
-# FUNCTION: TEMPORAL VISUALISATIONS ----
-
-beta.visualisations.temporal.ndvi <- function(beta.temporal.full){
-
-  
-  # Create string for plot subtitle
-  plots.included <- "PLOTS: NDVI Threshold (O.2)"
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.temporal.n.t <- ggplot(data = beta.temporal.full, aes(x = NDVI_Dis, y = Taxonomic_Dis, fill = Years)) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "magma", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.temporal.full$NDVI_Dis), max(beta.temporal.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.temporal.full$Taxonomic_Dis), max(beta.temporal.full$Taxonomic_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Taxonomic Dissimilarity [TEMPORAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Taxonomic (Bray-Curtis) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.temporal.n.f <- ggplot(data = beta.temporal.full, aes(x = NDVI_Dis, y = Functional_Dis, fill = Years)) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "viridis", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.temporal.full$NDVI_Dis), max(beta.temporal.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.temporal.full$Functional_Dis), max(beta.temporal.full$Functional_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Functional Dissimilarity [TEMPORAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Functional (FDis) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Visualize relationship between ndvi and taxonomic beta diversity
-  (plot.beta.temporal.n.b <- ggplot(data = beta.temporal.full, aes(x = NDVI_Dis, y = Biomass_Dis, fill = Years)) +
-      geom_point(shape = 21, size = 2, alpha = 1, colour = "#000000") +
-      stat_smooth(method = lm, fill = "#D3D3D3", colour = "#000000", alpha = 0.5, se = TRUE) +
-      scale_fill_viridis(option = "mako", begin = 0, end = 1, direction = 1, discrete = TRUE) +
-      scale_x_continuous(limits = c(min(beta.temporal.full$NDVI_Dis), max(beta.temporal.full$NDVI_Dis)), expand = c(0,0)) +
-      scale_y_continuous(limits = c(min(beta.temporal.full$Biomass_Dis), max(beta.temporal.full$Biomass_Dis)), expand = c(0,0)) +
-      labs(title = "NDVI vs Biomass Dissimilarity [TEMPORAL]",
-           subtitle = plots.included,
-           x = "NDVI (Euclidean) Dissimilarity",
-           y = "Biomass (Euclidean) Dissimilarity",
-           fill = "Year") +
-      theme_1() +
-      theme(legend.position = "right"))
-  
-  # Generate a panel of the outputs
-  panel.temporal <- grid.arrange(plot.beta.temporal.n.t, plot.beta.temporal.n.f, plot.beta.temporal.n.b, ncol = 3)
-  
-  # Export plot
-  ggsave(panel.temporal, file = "outputs/figures/beta_temporal_ndvi.png", width = 21, height = 5)
   
   
 } # End of function
@@ -314,11 +219,12 @@ beta.visualisations.temporal.ndvi <- function(beta.temporal.full){
 run.mantel.spatial.ndvi <- function(saddle.years){
   
   
-  # Load in taxonomic, functional and biomass distance matries
-  matrices.taxonomic <- get(load("outputs/output_beta_taxonomic_spatial.RData"))
-  matrices.functional <- get(load("outputs/output_beta_functional_spatial.RData"))
-  matrices.biomass <- get(load("outputs/output_beta_biomass_spatial.RData"))
-  matrices.ndvi <- get(load("outputs/output_beta_ndvi_spatial.RData"))
+  # Load in taxonomic, functional, biomass and NDVI distance matries
+  matrices.taxonomic <- get(load(paste0("outputs/output_beta_taxonomic_spatial", filepath.37, filepath.top.hits, ".RData")))
+  matrices.functional <- get(load(paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".RData")))
+  matrices.biomass <- get(load(paste0("outputs/output_beta_biomass_spatial", filepath.37, filepath.top.hits, ".RData")))
+  matrices.ndvi <- get(load(paste0("outputs/output_beta_ndvi_spatial_b", buffer, "_", spectral.metric, filepath.exponentiate, 
+                                   filepath.37, filepath.top.hits, ".RData")))
   
   # Remove duplicate objects
   rm(taxonomic.output.list, functional.output.list, biomass.output.list, ndvi.output.list)
@@ -402,13 +308,16 @@ run.mantel.spatial.ndvi <- function(saddle.years){
   mantel.panel <- grid.arrange(mantel.plot.r, mantel.plot.p, ncol = 2)
   
   # Export outputs to image file
-  ggsave(mantel.panel, filename = "outputs/figures/correlations_spatial_ndvi.png", width = 20, height = 10)
+  ggsave(mantel.panel, filename = paste0("outputs/figures/correlations_spatial_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                         filepath.37, filepath.top.hits, ".png"), width = 20, height = 10)
   
   # Save the list of mantel test outputs
-  save(mantel.tests, file = "outputs/output_statistics_spatial_ndvi.RData")
+  save(mantel.tests, file = paste0("outputs/output_statistics_spatial_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                   filepath.37, filepath.top.hits, ".RData"))
   
   # Save mantel test output statistics
-  write.csv(mantel.output.tidy, file = "outputs/output_statistics_spatial_ndvi.csv", row.names = FALSE)
+  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_spatial_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                              filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(mantel.output, mantel.output.tidy, mantel.tests, mantel.plot.r, mantel.plot.p, mantel.panel)
@@ -439,7 +348,7 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
     
     # Filter to single plot (would be a loop in function)
     beta.temporal.cut <- beta.temporal.years %>% 
-      filter(Plot == i)
+      filter(PLOT == i)
     
     # Cut to just the required distance metric
     beta.temporal.df.n <- dplyr::select(beta.temporal.cut, Year_1, Year_2, NDVI_Dis)
@@ -480,9 +389,9 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
       mantel.tests[[paste0("NDVI_Biomass_", i)]] <- mantel.nb
       
       # Extract useful values from the output
-      mantel.nt.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Taxonomic", "R_value" = mantel.nt$statistic, "p_value" = mantel.nt$signif)
-      mantel.nf.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Functional", "R_value" = mantel.nf$statistic, "p_value" = mantel.nf$signif)
-      mantel.nb.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Biomass", "R_value" = mantel.nb$statistic, "p_value" = mantel.nb$signif)
+      mantel.nt.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Taxonomic", "R_value" = mantel.nt$statistic, "p_value" = mantel.nt$signif)
+      mantel.nf.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Functional", "R_value" = mantel.nf$statistic, "p_value" = mantel.nf$signif)
+      mantel.nb.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Biomass", "R_value" = mantel.nb$statistic, "p_value" = mantel.nb$signif)
       
       # Bind dataframes to output
       mantel.output <- rbind(mantel.output, mantel.nt.output, mantel.nf.output, mantel.nb.output)
@@ -495,9 +404,9 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
       
       
       # Blank outputs
-      mantel.nt.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Taxonomic", "R_value" = NA, "p_value" = NA)
-      mantel.nf.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Functional", "R_value" = NA, "p_value" = NA)
-      mantel.nb.output <- data.frame("Plot" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
+      mantel.nt.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Taxonomic", "R_value" = NA, "p_value" = NA)
+      mantel.nf.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Functional", "R_value" = NA, "p_value" = NA)
+      mantel.nb.output <- data.frame("PLOT" = i, "Matrix_1" = "NDVI", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
       
       # Bind dataframes to output
       mantel.output <- rbind(mantel.output, mantel.nt.output, mantel.nf.output, mantel.nb.output)
@@ -517,8 +426,8 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
   } # End of plot loop
   
   # Export full output for later plotting
-  write.csv(mantel.output, file = paste0("outputs/output_complete_statistics_temporal_ndvi.csv"),
-            row.names = FALSE)
+  write.csv(mantel.output, file = paste0("outputs/output_statistics_temporal_FULL_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                         filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Create tidy dataframe output with mean values
   mantel.output.tidy <- mantel.output %>% 
@@ -532,7 +441,8 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
     distinct()
   
   # Output temporal statistics
-  write.csv(mantel.output.tidy, file = "outputs/output_statistics_temporal_ndvi.csv", row.names = FALSE)
+  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_temporal_SUMMARIZED_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                              filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Modify dataframes for plotting
   mantel.plotting <- mantel.output %>% 
@@ -559,7 +469,8 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
       theme(legend.position = "none"))
   
   # Export boxplot of statistics
-  ggsave(mantel.boxplot.R, filename = "outputs/figures/correlations_temporal_ndvi_box.png", width = 16, height = 8)
+  ggsave(mantel.boxplot.R, filename = paste0("outputs/figures/correlations_temporal_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                            filepath.37, filepath.top.hits, "_box.png"), width = 16, height = 8)
   
   # Generate raincloud plot for R values
   (mantel.raincloud.R <- ggplot(data = mantel.plotting, aes(x = Paired_Metrics, y = R_value, fill = Paired_Metrics)) +
@@ -581,7 +492,8 @@ run.mantel.temporal.ndvi <- function(composition.plots, composition.years){
       theme(legend.position = "none"))
   
   # Export raincloud plot of statistics
-  ggsave(mantel.raincloud.R, filename = "outputs/figures/correlations_temporal_ndvi_rain.png", width = 16, height = 8)
+  ggsave(mantel.raincloud.R, filename = paste0("outputs/figures/correlations_temporal_ndvi_b", buffer, "_", spectral.metric, filepath.exponentiate,
+                                               filepath.37, filepath.top.hits, "_rain.png"), width = 16, height = 8)
   
   
 } # End of function

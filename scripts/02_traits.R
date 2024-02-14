@@ -1,6 +1,6 @@
 # 02 - Saddle Trait Data
 # Joseph Everest
-# February 2023
+# February 2023, modified September 2023
 
 
 # LOAD PACKAGES & THEMES ----
@@ -14,13 +14,7 @@ library(Taxonstand)
 source("scripts/EX1_ggplot_themes.R")
 
 
-# ADD DIRECTORY: FIGURES ----
-
-# Add directory for all figures
-dir.create("outputs/figures")
-
-
-# **[CHANGE]** - DECIDE WHETHER TO USE ALL HITS OR TOP HITS ONLY ----
+# **[CHANGE]** - DECIDE WHETHER TO USE TOP HITS ONLY OR NOT ----
 
 # Decision
 top.hits.only <- "No" # Default = "No"
@@ -32,10 +26,7 @@ if (top.hits.only == "No"){ filepath.top.hits <- "" } else { filepath.top.hits <
 # IMPORT DATA (traits.1) ----
 
 # Load Niwot trait data
-traits.1 <- read.csv("data/nwt_traits.csv")
-
-# Replace NAs with blank spaces
-traits.1[is.na(traits.1)] <- ""
+traits.1 <- read.csv("data/plant_trait.ms.data.csv")
 
 
 # DATA MANIPULATION (traits.2) ----
@@ -97,7 +88,7 @@ species.traits <- unique(traits.3$Original_Name)
 # write.csv(species.checked, "outputs/output_tpl_traits.csv")
 
 # Read csv of taxonomy checker results and trim dataframe
-species.checked <- read.csv("outputs/output_tpl_traits.csv") %>% 
+species.checked <- read.csv(paste0("outputs/output_tpl_traits.csv")) %>% 
   dplyr::select(Taxon, New.Genus, New.Species, New.Taxonomic.status, Family) %>%
   mutate(Name_TPL = paste(New.Genus, New.Species, sep = " ")) %>%
   relocate(Name_TPL, New.Genus, Family, .before = New.Taxonomic.status) %>%
@@ -182,7 +173,7 @@ traits.6 <- traits.5 %>%
 # EXPORT CLEANED TRAIT DATAFRAME ----
 
 # Export dataframe to csv
-write.csv(traits.6, file = "outputs/output_traits_full.csv", row.names = FALSE)
+write.csv(traits.6, file = paste0("outputs/output_traits_full.csv"), row.names = FALSE)
 
 
 # SIMPLIFY TRAIT DATAFRAME FOR CALCULATING AVERAGES (traits.7) ----
@@ -194,9 +185,7 @@ traits.7 <- traits.6 %>%
                cols = c("Height", "SLA", "LDMC", "Chlorophyll", "D15N", "D13C", "LeafN", "LeafC")) %>% 
   mutate(Trait_Value = ifelse(is.nan(Trait_Value), NA, Trait_Value)) %>% 
   mutate(ID = row.names(.)) %>% 
-  relocate(ID, .before = ) %>% 
-  mutate(Trait_Value = ifelse(Trait_Value == "", NA, Trait_Value),
-         Trait_Value = as.numeric(Trait_Value))
+  relocate(ID, .before = )
 
 
 # LOAD IN COMPOSITION DATA & CUT (saddle.1) ----

@@ -1,64 +1,48 @@
 # 07a - Functions for statistically analysing output beta statistics
 # Joseph Everest
-# February 2023, adpated April 2023
+# February 2023
+
+
+# LOAD PACKAGES & THEMES----
+
+# Load packages
+library(tidyverse)
+library(gridExtra)
+library(vegan)
+
+# Load themes
+source("scripts/EX1_ggplot_themes.R")
 
 
 # FUNCTION: MANTEL TESTS (SPATIAL) ----
 
-run.mantel.spatial <- function(saddle.years, spectral.metric){
+run.mantel.spatial <- function(saddle.years){
   
   
   # Load in taxonomic, functional and biomass distance matries
-  matrices.taxonomic <- get(load(paste0("outputs/output_beta_taxonomic_spatial", filepath.37, filepath.top.hits, ".RData")))
-  matrices.functional <- get(load(paste0("outputs/output_beta_functional_spatial", filepath.37, filepath.top.hits, ".RData")))
-  matrices.biomass <- get(load(paste0("outputs/output_beta_biomass_spatial", filepath.37, filepath.top.hits, ".RData")))
+  matrices.taxonomic <- get(load(paste0("outputs/output_beta_taxonomic_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".RData")))
+  matrices.functional <- get(load(paste0("outputs/output_beta_functional_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".RData")))
+  matrices.biomass <- get(load(paste0("outputs/output_beta_biomass_spatial", filepath.brightness, filepath.37, filepath.top.hits, ".RData")))
   
   # Remove duplicate objects
   rm(taxonomic.output.list, functional.output.list, biomass.output.list)
+  
+  # Run if statement to determine which spectral matrices to import
+  if (PCA == "No"){
+    
+    # Load in matrices not PCAed
+    matrices.spectral <- get(load(paste0("outputs/output_beta_spectral_spatial_b", buffer, "_", spectral.metric, filepath.brightness,
+                                         filepath.smoothing, filepath.37, filepath.top.hits, ".RData")))
+    
+  } else {
+    
+    # Load in Euclidean matrices that are PCAed
+    matrices.spectral <- get(load(paste0("outputs/output_beta_spectral_spatial_b", buffer, "_", spectral.metric, filepath.brightness,
+                                         filepath.smoothing, "_PCA", filepath.37, filepath.top.hits, ".RData")))
+    
+  }
 
   
-  # Run if statement to determine which matrices to import
-  if (spectral.metric == "Euclidean"){
-    
-    
-    # Load in Euclidean matrices
-    matrices.spectral <- get(load(paste0("outputs/output_beta_spectral_PCA_spatial_euclidean", filepath.37, filepath.top.hits, ".RData")))
-    
-    # Remove duplicate objects
-    rm(spectra.output.list.euc)
-    
-        
-  } # End of Euclidean if statement
-  
-  
-  # Run if statement to determine which matrices to import
-  if (spectral.metric == "Manhattan"){
-    
-    
-    # Load in Manhattan matrices
-    matrices.spectral <- get(load(paste0("outputs/output_beta_spectral_PCA_spatial_manhattan", filepath.37, filepath.top.hits, ".RData")))
-    
-    # Remove duplicate objects
-    rm(spectra.output.list.man)
-    
-    
-  } # End of Manhattan if statement
-  
-  
-  # Run if statement to determine which matrices to import
-  if (spectral.metric == "SAM"){
-    
-    
-    # Load in SAM matrices
-    matrices.spectral <- get(load(paste0("outputs/output_beta_spectral_PCA_spatial_SAM", filepath.37, filepath.top.hits, ".RData")))
-    
-    # Remove duplicate objects
-    rm(spectra.output.list.sam)
-    
-    
-  } # End of SAM if statement
-      
-     
   # Create list to append mantel test outputs too
   mantel.tests <- list()
   
@@ -83,18 +67,18 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
     # Save outputs to list
     mantel.tests[[paste0("Taxonomic_Functional_", i)]] <- mantel.tf
     mantel.tests[[paste0("Taxonomic_Biomass_", i)]] <- mantel.tb
-    mantel.tests[[paste0("Taxonomic_Spectral_PCA_", i)]] <- mantel.ts
+    mantel.tests[[paste0("Taxonomic_Spectral", filepath.PCA, "_", i)]] <- mantel.ts
     mantel.tests[[paste0("Functional_Biomass_", i)]] <- mantel.fb
-    mantel.tests[[paste0("Functional_Spectral_PCA_", i)]] <- mantel.fs
-    mantel.tests[[paste0("Biomass_Spectral_PCA_", i)]] <- mantel.bs
+    mantel.tests[[paste0("Functional_Spectral", filepath.PCA, "_", i)]] <- mantel.fs
+    mantel.tests[[paste0("Biomass_Spectral", filepath.PCA, "_", i)]] <- mantel.bs
     
     # Extract useful values from the output
     mantel.tf.output <- data.frame("Year" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = mantel.tf$statistic, "p_value" = mantel.tf$signif)
     mantel.tb.output <- data.frame("Year" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = mantel.tb$statistic, "p_value" = mantel.tb$signif)
-    mantel.ts.output <- data.frame("Year" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.ts$statistic, "p_value" = mantel.ts$signif)
+    mantel.ts.output <- data.frame("Year" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.ts$statistic, "p_value" = mantel.ts$signif)
     mantel.fb.output <- data.frame("Year" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = mantel.fb$statistic, "p_value" = mantel.fb$signif)
-    mantel.fs.output <- data.frame("Year" = i, "Matrix_1" = "Functional", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.fs$statistic, "p_value" = mantel.fs$signif)
-    mantel.bs.output <- data.frame("Year" = i, "Matrix_1" = "Biomass", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.bs$statistic, "p_value" = mantel.bs$signif)
+    mantel.fs.output <- data.frame("Year" = i, "Matrix_1" = "Functional", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.fs$statistic, "p_value" = mantel.fs$signif)
+    mantel.bs.output <- data.frame("Year" = i, "Matrix_1" = "Biomass", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.bs$statistic, "p_value" = mantel.bs$signif)
     
     # Bind dataframes to output
     mantel.output <- rbind(mantel.output, mantel.tf.output, mantel.tb.output, mantel.ts.output,
@@ -116,9 +100,9 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
   
   # Change factor order
   mantel.output.tidy$Matrix_1 <- factor(mantel.output.tidy$Matrix_1,
-                                        levels = c("Taxonomic", "Functional", "Biomass", "Spectral_PCA"))
+                                        levels = c("Taxonomic", "Functional", "Biomass", paste0("Spectral", filepath.PCA)))
   mantel.output.tidy$Matrix_2 <- factor(mantel.output.tidy$Matrix_2,
-                                        levels = c("Taxonomic", "Functional", "Biomass", "Spectral_PCA"))
+                                        levels = c("Taxonomic", "Functional", "Biomass", paste0("Spectral", filepath.PCA)))
   
   # Plot correlation matrices for R-values
   (mantel.plot.r <- ggplot(data = mantel.output.tidy, aes(x = Matrix_1, y = Matrix_2, fill = R_value)) +
@@ -128,7 +112,7 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
                 color = "black", fontface = "bold", size = 5) +
       facet_wrap(~ Year) +
       labs(title = "Mantel Test Outputs: R-values",
-           subtitle = paste0("SPATIAL: (Spectral PCA as ", spectral.metric, ")"),
+           subtitle = paste0("SPATIAL: (Spectral", filepath.PCA, "as ", spectral.metric, ")"),
            x = "", y = "", fill = "R-Value") +
       theme_1() +
       theme(legend.position = "right"))
@@ -141,7 +125,7 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
                 color = "black", fontface = "bold", size = 5) +
       facet_wrap(~ Year) +
       labs(title = "Mantel Test Outputs: p-values",
-           subtitle = paste0("SPATIAL: (Spectral PCA as ", spectral.metric, ")"),
+           subtitle = paste0("SPATIAL: (Spectral", filepath.PCA, "as ", spectral.metric, ")"),
            x = "", y = "", fill = "p-Value") +
       theme_1() +
       theme(legend.position = "right"))
@@ -150,15 +134,16 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
   mantel.panel <- grid.arrange(mantel.plot.r, mantel.plot.p, ncol = 2)
   
   # Export outputs to image file
-  ggsave(mantel.panel, filename = paste0("outputs/figures/correlations_PCA_spatial_", spectral.metric, filepath.37, filepath.top.hits, ".png"),
-         width = 20, height = 10)
+  ggsave(mantel.panel, filename = paste0("outputs/figures/correlations_spatial_b", buffer, "_", spectral.metric, filepath.brightness,
+                                         filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, ".png"), width = 20, height = 10)
   
   # Save the list of mantel test outputs
-  save(mantel.tests, file = paste0("outputs/output_statistics_PCA_spatial_", spectral.metric, filepath.37, filepath.top.hits, ".RData"))
+  save(mantel.tests, file = paste0("outputs/output_statistics_spatial_b", buffer, "_", spectral.metric, filepath.brightness,
+                                   filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, ".RData"))
   
   # Save mantel test output statistics
-  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_PCA_spatial_", spectral.metric, filepath.37, filepath.top.hits, ".csv"),
-            row.names = FALSE)
+  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_spatial_b", buffer, "_", spectral.metric, filepath.brightness,
+                                              filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(mantel.output, mantel.output.tidy, mantel.tests, mantel.plot.r, mantel.plot.p, mantel.panel)
@@ -169,17 +154,16 @@ run.mantel.spatial <- function(saddle.years, spectral.metric){
 
 # FUNCTION: MANTEL TESTS (TEMPORAL) ----
 
-run.mantel.temporal <- function(saddle.plots, spectral.metric){
+run.mantel.temporal <- function(saddle.plots){
   
-  
-  # Create list to append mantel test outputs too
+   # Create list to append mantel test outputs too
   mantel.tests <- list()
   
   # Create dataframe to append mantel test statistics too
   mantel.output <- data.frame()
   
   # Generate column name for spectral variable we wish to keep
-  spectral.variable <- paste0("Spectral_PCA_", spectral.metric, "_Dis")
+  spectral.variable <- paste0("Spectral", filepath.PCA, "_", spectral.metric, "_Dis")
   
   
   # Run loop for each plot
@@ -192,7 +176,7 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
     
     # Filter to single plot (would be a loop in function)
     beta.temporal.cut <- beta.temporal.years %>% 
-      filter(Plot == i)
+      filter(PLOT == i)
     
     # Cut to just the required distance metric
     beta.temporal.df.t <- dplyr::select(beta.temporal.cut, Year_1, Year_2, Taxonomic_Dis)
@@ -205,8 +189,8 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
     spectral.na.sum <- sum(beta.temporal.df.s$Spectral_Dis)
     
     
-    # Run an if loop for whether or not spectral is all NA
-    if (!is.na(spectral.na.sum) == TRUE){ # Not NA (i.e. has values to run)
+    # Run an if loop for whether or not any of the spectral values are NA
+    if (!is.na(spectral.na.sum) == TRUE){ # Not NA (i.e. has all values to run)
       
       
       # Determine whether the temporal matrices can run (e.g. no temporal matrices for plot 37 as only one species in each year)
@@ -242,18 +226,18 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
         # Save outputs to list
         mantel.tests[[paste0("Taxonomic_Functional_", i)]] <- mantel.tf
         mantel.tests[[paste0("Taxonomic_Biomass_", i)]] <- mantel.tb
-        mantel.tests[[paste0("Taxonomic_Spectral_PCA_", i)]] <- mantel.ts
+        mantel.tests[[paste0("Taxonomic_Spectral", filepath.PCA, "_", i)]] <- mantel.ts
         mantel.tests[[paste0("Functional_Biomass_", i)]] <- mantel.fb
-        mantel.tests[[paste0("Functional_Spectral_PCA_", i)]] <- mantel.fs
-        mantel.tests[[paste0("Biomass_Spectral_PCA_", i)]] <- mantel.bs
+        mantel.tests[[paste0("Functional_Spectral", filepath.PCA, "_", i)]] <- mantel.fs
+        mantel.tests[[paste0("Biomass_Spectral", filepath.PCA, "_", i)]] <- mantel.bs
         
         # Extract useful values from the output
-        mantel.tf.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = mantel.tf$statistic, "p_value" = mantel.tf$signif)
-        mantel.tb.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = mantel.tb$statistic, "p_value" = mantel.tb$signif)
-        mantel.ts.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.ts$statistic, "p_value" = mantel.ts$signif)
-        mantel.fb.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = mantel.fb$statistic, "p_value" = mantel.fb$signif)
-        mantel.fs.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.fs$statistic, "p_value" = mantel.fs$signif)
-        mantel.bs.output <- data.frame("Plot" = i, "Matrix_1" = "Biomass", "Matrix_2" = "Spectral_PCA", "R_value" = mantel.bs$statistic, "p_value" = mantel.bs$signif)
+        mantel.tf.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = mantel.tf$statistic, "p_value" = mantel.tf$signif)
+        mantel.tb.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = mantel.tb$statistic, "p_value" = mantel.tb$signif)
+        mantel.ts.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.ts$statistic, "p_value" = mantel.ts$signif)
+        mantel.fb.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = mantel.fb$statistic, "p_value" = mantel.fb$signif)
+        mantel.fs.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.fs$statistic, "p_value" = mantel.fs$signif)
+        mantel.bs.output <- data.frame("PLOT" = i, "Matrix_1" = "Biomass", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = mantel.bs$statistic, "p_value" = mantel.bs$signif)
         
         # Bind dataframes to output
         mantel.output <- rbind(mantel.output, mantel.tf.output, mantel.tb.output, mantel.ts.output,
@@ -264,12 +248,12 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
         
         
         # Create template outputs to bind to full output
-        mantel.tf.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = NA, "p_value" = NA)
-        mantel.tb.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
-        mantel.ts.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
-        mantel.fb.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
-        mantel.fs.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
-        mantel.bs.output <- data.frame("Plot" = i, "Matrix_1" = "Biomass", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
+        mantel.tf.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = NA, "p_value" = NA)
+        mantel.tb.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
+        mantel.ts.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
+        mantel.fb.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = NA, "p_value" = NA)
+        mantel.fs.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
+        mantel.bs.output <- data.frame("PLOT" = i, "Matrix_1" = "Biomass", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
         
         # Bind dataframes to output
         mantel.output <- rbind(mantel.output, mantel.tf.output, mantel.tb.output, mantel.ts.output,
@@ -311,12 +295,12 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
       mantel.tests[[paste0("Functional_Biomass_", i)]] <- mantel.fb
       
       # Extract useful values from the output
-      mantel.tf.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = mantel.tf$statistic, "p_value" = mantel.tf$signif)
-      mantel.tb.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = mantel.tb$statistic, "p_value" = mantel.tb$signif)
-      mantel.ts.output <- data.frame("Plot" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
-      mantel.fb.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = mantel.fb$statistic, "p_value" = mantel.fb$signif)
-      mantel.fs.output <- data.frame("Plot" = i, "Matrix_1" = "Functional", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
-      mantel.bs.output <- data.frame("Plot" = i, "Matrix_1" = "Biomass", "Matrix_2" = "Spectral_PCA", "R_value" = NA, "p_value" = NA)
+      mantel.tf.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Functional", "R_value" = mantel.tf$statistic, "p_value" = mantel.tf$signif)
+      mantel.tb.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = "Biomass", "R_value" = mantel.tb$statistic, "p_value" = mantel.tb$signif)
+      mantel.ts.output <- data.frame("PLOT" = i, "Matrix_1" = "Taxonomic", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
+      mantel.fb.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = "Biomass", "R_value" = mantel.fb$statistic, "p_value" = mantel.fb$signif)
+      mantel.fs.output <- data.frame("PLOT" = i, "Matrix_1" = "Functional", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
+      mantel.bs.output <- data.frame("PLOT" = i, "Matrix_1" = "Biomass", "Matrix_2" = paste0("Spectral", filepath.PCA), "R_value" = NA, "p_value" = NA)
       
       # Bind dataframes to output
       mantel.output <- rbind(mantel.output, mantel.tf.output, mantel.tb.output, mantel.ts.output,
@@ -339,8 +323,8 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
   } # End of plot loop
   
   # Export full output for later plotting
-  write.csv(mantel.output, file = paste0("outputs/output_complete_statistics_PCA_temporal_", spectral.metric, filepath.37, filepath.top.hits, ".csv"),
-            row.names = FALSE)
+  write.csv(mantel.output, file = paste0("outputs/output_statistics_temporal_FULL_b", buffer, "_", spectral.metric, filepath.brightness,
+                                         filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Create tidy dataframe output with mean values
   mantel.output.tidy <- mantel.output %>% 
@@ -354,8 +338,8 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
     distinct()
   
   # Output temporal statistics
-  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_PCA_temporal_", spectral.metric, filepath.37, filepath.top.hits, ".csv"),
-            row.names = FALSE)
+  write.csv(mantel.output.tidy, file = paste0("outputs/output_statistics_temporal_SUMMARIZED_b", buffer, "_", spectral.metric, filepath.brightness,
+                                              filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Modify dataframes for plotting
   mantel.plotting <- mantel.output %>% 
@@ -382,8 +366,8 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
       theme(legend.position = "none"))
   
   # Export boxplot of statistics
-  ggsave(mantel.boxplot.R, filename = paste0("outputs/figures/correlations_PCA_temporal_", spectral.metric, filepath.37, filepath.top.hits, "_box.png"),
-         width = 16, height = 8)
+  ggsave(mantel.boxplot.R, filename = paste0("outputs/figures/correlations_temporal_b", buffer, "_", spectral.metric, filepath.brightness,
+                                             filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, "_box.png"), width = 16, height = 8)
   
   # Generate raincloud plot for R values
   (mantel.raincloud.R <- ggplot(data = mantel.plotting, aes(x = Paired_Metrics, y = R_value, fill = Paired_Metrics)) +
@@ -405,8 +389,8 @@ run.mantel.temporal <- function(saddle.plots, spectral.metric){
       theme(legend.position = "none"))
   
   # Export raincloud plot of statistics
-  ggsave(mantel.raincloud.R, filename = paste0("outputs/figures/correlations_PCA_temporal_", spectral.metric, filepath.37, filepath.top.hits, "_rain.png"),
-         width = 16, height = 8)
+  ggsave(mantel.raincloud.R, filename = paste0("outputs/figures/correlations_temporal_b", buffer, "_", spectral.metric, filepath.brightness,
+                                               filepath.smoothing, filepath.PCA, filepath.37, filepath.top.hits, "_rain.png"), width = 16, height = 8)
   
   
 } # End of function

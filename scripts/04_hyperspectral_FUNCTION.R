@@ -1,6 +1,23 @@
 # 04a - Functions for working with NEON hyperspectral data
 # Joseph Everest & NEON
-# February 2023
+# February 2023, modified April 2023, May 2023, September 2023
+
+
+# LOAD PACKAGES & THEMES ----
+
+# Load packages
+library(tidyverse)
+library(viridis)
+library(gridExtra)
+library(rgdal)
+library(raster)
+# install.packages("BiocManager")
+# BiocManager::install("rhdf5")
+library(rhdf5)
+library(neonhs)
+
+# Load themes
+source("hyperspectral/scripts/EX1_ggplot_themes.R")
 
 
 # FUNCTION: IMPORT HYPERSPECTRAL TILE ----
@@ -260,71 +277,94 @@ extract.pixel.spectra <- function(tile.list, year.list, buffer){
       separate(Tile, into = c("Year", "Tile"), sep = "_") %>% 
       mutate(Tile = paste0(Year, "_449000_", Tile, "000")) %>% 
       relocate(Year, Tile, .after = id)
+    
+    # Run loop to determine whether brightness normalizing or not
+    if (brightness == "Yes"){
+      
+      # Brightness normalise the spectra for each plot
+          # Divide each band by the sqrt of the sum of squared reflectances
+      saddle.spectra.5 <- saddle.spectra.4 %>% 
+        group_by(PLOT, Year) %>% 
+        mutate(bn_key = sqrt(sum(scale_Reflectance^2))) %>% 
+        ungroup() %>% 
+        mutate(bn_Reflectance = scale_Reflectance / bn_key) %>% 
+        dplyr::select(-bn_key)
+      
+    } else {
+      
+      # Don't brightness normalize
+      saddle.spectra.5 <- saddle.spectra.4 %>% 
+        mutate(bn_Reflectance = scale_Reflectance)
+      
+    }
 
-    # Brightness normalise the spectra for each plot
-      # Divide each band by the sqrt of the sum of squared reflectances
-    saddle.spectra.5 <- saddle.spectra.4 %>% 
-      group_by(PLOT, Year) %>% 
-      mutate(bn_key = sqrt(sum(scale_Reflectance^2))) %>% 
-      ungroup() %>% 
-      mutate(bn_Reflectance = scale_Reflectance / bn_key) %>% 
-      dplyr::select(-bn_key)
-    
-    # Create dataframe of spectra for smoothing
-    saddle.smooth.1 <- saddle.spectra.5 %>% 
-      dplyr::select(id, Band, bn_Reflectance) %>% 
-      pivot_wider(names_from = "Band", values_from = "bn_Reflectance") %>% 
-      column_to_rownames(var = "id")
-    
-    # Create vector of remaining wavelengths and bands after filtering
-    saddle.wavelengths <- sort(unique(saddle.spectra.5$Wavelength))
-    
-    # Turn into class object 'speclib' (DON'T LOAD "hsdar" PACKAGE (confuses tidyverse)
-    saddle.smooth.2 <- hsdar::speclib(as.matrix(saddle.smooth.1), saddle.wavelengths)
-    
-    # Apply smoothing function
-    saddle.smooth.3 <- hsdar::noiseFiltering(saddle.smooth.2, method = 'sgolay', n = 7)
-    
-    # Turn smoothed speclib object back into matrix
-    saddle.smooth.4 <- as.data.frame(hsdar::spectra(saddle.smooth.3))
-    
-    # Create vector of IDs for joining back to main dataframe
-    saddle.ids <- rownames(saddle.smooth.1)
-    
-    # Create vector of remaining wavelengths and bands after filtering
-    saddle.bands <- unique(saddle.spectra.5$Band)
-    
-    # Assign row and column names to dataframe for rejoining
-    rownames(saddle.smooth.4) <- saddle.ids
-    colnames(saddle.smooth.4) <- saddle.bands
-    
-    # Turn back into long format for rejoining
-    saddle.smooth.5 <- saddle.smooth.4 %>% 
-      rownames_to_column(var = "id") %>% 
-      mutate(id = as.integer(id)) %>% 
-      pivot_longer(cols = 2:ncol(.), names_to = "Band", values_to = "smooth_Reflectance") %>% 
-      mutate(Band = as.integer(Band))
-    
-    # Join smoothed reflectance data back to the main spectral output for this tile
-    saddle.spectra.6 <- left_join(saddle.spectra.5, saddle.smooth.5, by = c("id" = "id", "Band" = "Band")) %>% 
-      dplyr::select(-id) %>% 
-      rename(Plot = PLOT)
+    # Run loop to determine whether smoothing or not
+    if (smoothing == "Yes"){
+      
+      # Create dataframe of spectra for smoothing
+      saddle.smooth.1 <- saddle.spectra.5 %>% 
+        dplyr::select(id, Band, bn_Reflectance) %>% 
+        pivot_wider(names_from = "Band", values_from = "bn_Reflectance") %>% 
+        column_to_rownames(var = "id")
+      
+      # Create vector of remaining wavelengths and bands after filtering
+      saddle.wavelengths <- sort(unique(saddle.spectra.5$Wavelength))
+      
+      # Turn into class object 'speclib' (DON'T LOAD "hsdar" PACKAGE (confuses tidyverse)
+      saddle.smooth.2 <- hsdar::speclib(as.matrix(saddle.smooth.1), saddle.wavelengths)
+      
+      # Apply smoothing function
+      saddle.smooth.3 <- hsdar::noiseFiltering(saddle.smooth.2, method = 'sgolay', n = 7)
+      
+      # Turn smoothed speclib object back into matrix
+      saddle.smooth.4 <- as.data.frame(hsdar::spectra(saddle.smooth.3))
+      
+      # Create vector of IDs for joining back to main dataframe
+      saddle.ids <- rownames(saddle.smooth.1)
+      
+      # Create vector of remaining wavelengths and bands after filtering
+      saddle.bands <- unique(saddle.spectra.5$Band)
+      
+      # Assign row and column names to dataframe for rejoining
+      rownames(saddle.smooth.4) <- saddle.ids
+      colnames(saddle.smooth.4) <- saddle.bands
+      
+      # Turn back into long format for rejoining
+      saddle.smooth.5 <- saddle.smooth.4 %>% 
+        rownames_to_column(var = "id") %>% 
+        mutate(id = as.integer(id)) %>% 
+        pivot_longer(cols = 2:ncol(.), names_to = "Band", values_to = "smooth_Reflectance") %>% 
+        mutate(Band = as.integer(Band))
+      
+      # Join smoothed reflectance data back to the main spectral output for this tile
+      saddle.spectra.6 <- left_join(saddle.spectra.5, saddle.smooth.5, by = c("id" = "id", "Band" = "Band")) %>% 
+        dplyr::select(-id) %>% 
+        rename(Plot = PLOT)
+      
+    } else {
+      
+      # Don't smooth
+      saddle.spectra.6 <- saddle.spectra.5 %>% 
+        mutate(smooth_Reflectance = bn_Reflectance)
+      
+    }
     
     # Filter water absorption and extreme bands from the output
     saddle.spectra.7 <- saddle.spectra.6 %>% 
       mutate(REMOVE = ifelse(Band %in% saddle.bands.remove.4, TRUE, FALSE)) %>% 
       filter(REMOVE != TRUE) %>% 
       dplyr::select(-REMOVE)
-    
+
     # Append output to main output dataframe
     spectra.output <- rbind(spectra.output, saddle.spectra.7)
     
-    rm(tile.ID, tile.information.cut, tile.bands, tile.NoDataValue, tile.filename, tile.crs,
-       tile.extent, tile.raster.hyperspec, tile.stack.hyperspec, tile.band.names, tile.specific.band,
-       saddle.spectra.indiv.band, tile.wavelengths, tile.wavelengths.key, saddle.smooth.1,
-       saddle.wavelengths, saddle.smooth.2, saddle.smooth.3, saddle.smooth.4, saddle.ids,
-       saddle.bands, saddle.smooth.5, saddle.spectra.1, saddle.spectra.2, saddle.spectra.3,
-       saddle.spectra.4, saddle.spectra.5, saddle.spectra.6, saddle.spectra.7)
+    # Remove intermediate objects
+    # rm(tile.ID, tile.information.cut, tile.bands, tile.NoDataValue, tile.filename, tile.crs,
+    #    tile.extent, tile.raster.hyperspec, tile.stack.hyperspec, tile.band.names, tile.specific.band,
+    #    saddle.spectra.indiv.band, tile.wavelengths, tile.wavelengths.key, saddle.smooth.1,
+    #    saddle.wavelengths, saddle.smooth.2, saddle.smooth.3, saddle.smooth.4, saddle.ids,
+    #    saddle.bands, saddle.smooth.5, saddle.spectra.1, saddle.spectra.2, saddle.spectra.3,
+    #    saddle.spectra.4, saddle.spectra.5, saddle.spectra.6, saddle.spectra.7)
     
     
   } # End of tile loop
@@ -332,28 +372,28 @@ extract.pixel.spectra <- function(tile.list, year.list, buffer){
   
   # Tidy the spectra output
   spectra.output.tidy <- spectra.output %>%
-    arrange(Year, Plot, Wavelength)
+    arrange(Year, PLOT, Wavelength)
   
   # Calculate the mean NIR for each plot year combo
   spectra.NIR <- spectra.output.tidy %>%
-    dplyr::select(Year, Plot, Wavelength, scale_Reflectance) %>% 
+    dplyr::select(Year, PLOT, Wavelength, scale_Reflectance) %>% 
     filter(Wavelength >= 752 & Wavelength <= 1048) %>% 
-    group_by(Year, Plot) %>% 
+    group_by(Year, PLOT) %>% 
     summarise(mean_NIR = mean(scale_Reflectance)) %>%
     ungroup()
   
   # Join this information by plot and year to the main output dataframe
-  spectra.output.NIR <- left_join(spectra.output.tidy, spectra.NIR, by = c("Year" = "Year", "Plot" = "Plot"))
+  spectra.output.NIR <- left_join(spectra.output.tidy, spectra.NIR, by = c("Year" = "Year", "PLOT" = "PLOT"))
   
   # Generate broad-band NDVI using Sentinel-2 bands
   spectra.NDVI.broad <- spectra.output.NIR %>% 
-    dplyr::select(Plot, Year, Wavelength, scale_Reflectance) %>% 
+    dplyr::select(PLOT, Year, Wavelength, scale_Reflectance) %>% 
     mutate(Sentinel_Band = NA, # Label wavelengths in Sentinel-2 bands
            Sentinel_Band = ifelse(Wavelength > 633 & Wavelength < 695, "Band_4", Sentinel_Band),
            Sentinel_Band = ifelse(Wavelength > 726 & Wavelength < 938, "Band_8", Sentinel_Band)) %>% 
     filter(Sentinel_Band %in% c("Band_4", "Band_8")) %>% # Retain only Sentintel-2 bands
     dplyr::select(-Wavelength) %>% 
-    group_by(Plot, Year, Sentinel_Band) %>% 
+    group_by(PLOT, Year, Sentinel_Band) %>% 
     summarise(mean_Reflectance = mean(scale_Reflectance)) %>% # Calculate mean reflectance for each Sentinel-2 band
     ungroup() %>% 
     pivot_wider(names_from = "Sentinel_Band", values_from = "mean_Reflectance") %>% 
@@ -362,7 +402,7 @@ extract.pixel.spectra <- function(tile.list, year.list, buffer){
   
   # Generate narrow-band NDVI using NEON specified bands
   spectra.NDVI.narrow <- spectra.output.NIR %>% 
-    dplyr::select(Plot, Year, Band, scale_Reflectance) %>% 
+    dplyr::select(PLOT, Year, Band, scale_Reflectance) %>% 
     filter(Band %in% c(58, 90)) %>% 
     mutate(Band = paste0("Band_", Band)) %>% 
     pivot_wider(names_from = "Band", values_from = "scale_Reflectance") %>% 
@@ -370,17 +410,15 @@ extract.pixel.spectra <- function(tile.list, year.list, buffer){
     dplyr::select(-c(Band_90, Band_58))
   
   # Join two NDVI outputs together in one dataframe
-  spectra.NDVI <- left_join(spectra.NDVI.broad, spectra.NDVI.narrow, by = c("Year" = "Year", "Plot" = "Plot"))
-  
-  # Write output to csv
-  write.csv(spectra.NDVI, file = paste0("outputs/saddle_ndvi", filepath.top.hits, ".csv"), row.names = FALSE)
-  
+  spectra.NDVI <- left_join(spectra.NDVI.broad, spectra.NDVI.narrow, by = c("Year" = "Year", "PLOT" = "PLOT"))
+
   # Join this information by plot and year to the main output dataframe
-  spectra.output.NDVI <- left_join(spectra.output.NIR, spectra.NDVI, by = c("Year" = "Year", "Plot" = "Plot"))
+  spectra.output.NDVI <- left_join(spectra.output.NIR, spectra.NDVI, by = c("Year" = "Year", "PLOT" = "PLOT"))
   
   # Save the overall spectra output
-  write.csv(spectra.output.NDVI, file = paste0("outputs/output_saddle_spectra_b", buffer, filepath.top.hits, ".csv"),
-            row.names = FALSE)
+  write.csv(spectra.output.NDVI, file = paste0("outputs/output_saddle_spectra_b", buffer, 
+                                               filepath.brightness, filepath.smoothing,
+                                               filepath.top.hits, ".csv"), row.names = FALSE)
   
   # Remove intermediate objects
   rm(spectra.output, spectra.NIR, spectra.output.NIR, spectra.NDVI, spectra.output.NDVI)
@@ -397,12 +435,13 @@ extract.pixel.spectra <- function(tile.list, year.list, buffer){
             y = "Reflectance (BN & Smooth)",
             title = "Saddle Spectra by Plot",
             subtitle = paste0("Year: ", k)) +
-       facet_wrap(~ Plot)) + 
+       facet_wrap(~ PLOT)) + 
       theme_1()
     
     # Save panel of spectra
-    ggsave(pixel.signatures, filename = paste0("outputs/figures/saddle_spectra_by_plot_b", buffer, "_", k, filepath.top.hits, ".png"),
-           width = 12, height = 9)
+    ggsave(pixel.signatures, filename = paste0("outputs/figures/saddle_spectra_by_plot_b", buffer,
+                                               "_", k, filepath.brightness, filepath.smoothing,
+                                               filepath.top.hits, ".png"), width = 12, height = 9)
     
     
   } # End of year loop
@@ -426,9 +465,12 @@ extract.comparison.plots <- function(buffers){
     
     
     # Import dataframes for each of the specified buffers
-    buffer.input.1 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[1], ".csv"))
-    buffer.input.2 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[2], ".csv"))
-    buffer.input.3 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[3], ".csv"))
+    buffer.input.1 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[1],
+                                      filepath.brightness, filepath.smoothing, filepath.PCA, filepath.top.hits, ".csv"))
+    buffer.input.2 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[2], 
+                                      filepath.brightness, filepath.smoothing, filepath.PCA, filepath.top.hits, ".csv"))
+    buffer.input.3 <- read.csv(paste0("outputs/output_saddle_spectra_b", buffers[3], 
+                                      filepath.brightness, filepath.smoothing, filepath.PCA, filepath.top.hits, ".csv"))
     
     # Determine what the buffers are
     buffer.1 <- paste0(buffers[1])
@@ -451,9 +493,9 @@ extract.comparison.plots <- function(buffers){
   # Join together the input dataframes for plotting
   buffer.input.full <- buffer.input.1 %>% 
     dplyr::select(-c(Tile, EASTING, NORTHING, Reflectance, Wavelength, scale_Reflectance, bn_Reflectance, mean_NIR)) %>% 
-    left_join(., buffer.input.2, by = c("Plot" = "Plot", "Year" = "Year", "Band" = "Band")) %>% 
+    left_join(., buffer.input.2, by = c("PLOT" = "PLOT", "Year" = "Year", "Band" = "Band")) %>% 
     dplyr::select(-c(Tile, EASTING, NORTHING, Reflectance, Wavelength, scale_Reflectance, bn_Reflectance, mean_NIR)) %>% 
-    left_join(., buffer.input.3, by = c("Plot" = "Plot", "Year" = "Year", "Band" = "Band")) %>% 
+    left_join(., buffer.input.3, by = c("PLOT" = "PLOT", "Year" = "Year", "Band" = "Band")) %>% 
     dplyr::select(-c(Tile, EASTING, NORTHING, Reflectance, Wavelength, scale_Reflectance, bn_Reflectance, mean_NIR))
   
   # Plot two of the buffers against each other to observe the relationship
@@ -519,7 +561,8 @@ extract.comparison.plots <- function(buffers){
   
   # Output plot to .png
   ggsave(buffer.panel, filename = paste0("outputs/figures/beta_spectral_comparison_buffer_b",
-                                         buffer.1, "_", buffer.2, "_", buffer.3, ".png"), width = 18, height = 5)
+                                         buffer.1, "_", buffer.2, "_", buffer.3, filepath.brightness,
+                                         filepath.smoothing, filepath.top.hits, ".png"), width = 18, height = 5)
     
   
 } # End of function
